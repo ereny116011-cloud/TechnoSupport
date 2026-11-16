@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <h2 style="margin-bottom:24px; color:#1f2937;" data-i18n="adminLogin">Admin Girişi</h2>
             <form id="adminLoginForm">
                 <label data-i18n="adminUser">Kullanıcı Adı</label>
-                <input type="text" id="loginUser" required>
+                <input type="text" id="loginUser" autocomplete="username" required>
                 <label data-i18n="adminPass">Şifre</label>
-                <input type="password" id="loginPass" required>
+                <input type="password" id="loginPass" autocomplete="current-password" required>
                 <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;" data-i18n="adminLoginBtn">Giriş Yap</button>
             </form>
         </div>
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (FE_I18N[lang] && FE_I18N[lang][k]) el.innerHTML = FE_I18N[lang][k];
     });
 
-    const theme = localStorage['ts-theme'] || 'dark';
+    const theme = localStorage['ts-theme'] || 'light';
     if (theme === 'light') document.body.classList.add('light');
 
     renderAdmin();

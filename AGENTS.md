@@ -24,9 +24,9 @@ Kod tabanı **derleme adımı olmayan** statik HTML/CSS/JS + (isteğe bağlı) t
 
 ```
 /
-├─ index.html           # Ana sayfa: destek talepleri + AI sohbet widget'ı
-├─ admin.html           # Yetkili paneli: gelen talepler, yanıtla, kapat
-├─ style.css            # Tema, responsive düzen
+├─ index.html           # Ana sayfa: Tailwind CSS CDN + hero, destek kartları, talep formu, AI widget
+├─ admin.html           # Yetkili paneli: gelen talepler, yanıtla, kapat (style.css)
+├─ style.css            # Yalnızca admin.html için tema, tablo ve responsive düzen
 ├─ app.js               # i18n, chat mantığı, ticket işlemleri, admin girişi
 ├─ CNAME                # GitHub Pages özel alan adı (support.technoweb.win)
 ├─ app.yaml             # Wasmer Edge dağıtım tanımı (canlı site bu dosyadan deploy edilir)
@@ -71,9 +71,9 @@ Kullanıcı ──► Destek talebi açar ──► POST /api/tickets (Worker)
 Yetkili ──► admin.html ──► Giriş (Worker) ──► Talepleri görür, yanıt yazar, kapatır
 ```
 
-- **Kimlik doğrulama (admin):** `POST /api/auth/login` → Worker `env.ADMIN_USER` / `env.ADMIN_PASS` ile doğrular.
+- **Kimlik doğrulama (admin):** `POST /api/support/auth/login` → Worker `env.ADMIN_USER` / `env.ADMIN_PASS` ile doğrular.
   Frontend yalnızca `sessionStorage['ts_admin_auth']` (Basic header) tutar; credential frontend'de **yoktur**.
-- **Tema:** `localStorage['ts-theme']` (`dark`/`light`) + `body.light`.
+- **Tema:** Varsayılan açık; `localStorage['ts-theme']` (`light`/`dark`).
 - **Dil:** `localStorage['ts-lang']` (`tr`/`en`).
 - **Worker URL:** `app.js` içinde sabit (`WORKER_URL`). Kullanıcı tarafından değiştirilemez.
 - **API anahtarı:** Yalnızca Worker secret'ında (`KILO_API`). Tarayıcıya asla çıkmaz.
@@ -122,14 +122,20 @@ tablolarında tutulur. Tablolar ilk kullanımda worker tarafından kendisi oluş
 
 ## 7. Frontend kuralları
 
-- **Mimari:** `index.html` + `admin.html` + `style.css` + `app.js` (build yok, framework yok).
+- **Mimari:** `index.html` + `admin.html` + `app.js`; yalnızca admin paneli `style.css` kullanır.
+  Ana sayfa **Tailwind CSS Play CDN** (`cdn.tailwindcss.com`) ile yazılmıştır; build adımı yoktur.
+  `tailwind.config` inline `<script>` içinde tanımlıdır (renkler: `brand`, `navy`, `ink`).
+- **Tasarım dili (ana sayfa):** buz mavisi zemin (`#f8fafc`), `#2563eb` vurgu, `#1e3a8a` lacivert,
+  Inter fontu, `rounded-2xl` kartlar ve yumuşak gölgeler. Yeni bölüm eklerken bu dili koruyun.
 - **API anahtarı asla repoya yazılmaz** ve tarayıcıya çıkmaz; yalnızca Worker secret'ında durur.
 - **Worker proxy URL'si kullanıcı tarafından değiştirilemez** (sabit `WORKER_URL`); ayarlar arayüzünde sunulmaz.
 - **Admin credential frontend'de bulunmaz.** Giriş `POST /api/support/auth/login` ile Worker'da doğrulanır.
 - **i18n:** `app.js` içinde `FE_I18N.tr` ve `FE_I18N.en`; metinler `data-i18n` / `data-i18n-placeholder` /
-  `data-i18n-html` öznitelikleriyle bağlanır. Yeni metin eklerken **iki dili de** ekleyin.
+  `data-i18n-html` / `data-i18n-title` öznitelikleriyle bağlanır. Yeni metin eklerken **iki dili de** ekleyin.
 - **Kullanıcı kaynaklı metinleri** `escapeHtml()` ile kaçırın.
-- **Tema:** `localStorage['ts-theme']`; `body.light` sınıfı ile açık tema.
+- **Tema:** Varsayılan açık tema; `localStorage['ts-theme']` (`light`/`dark`) saklanır.
+- **Sohbet widget'ı:** Sağ altta sabit `#aiBubbleBtn`; panel `#aiChatPanel` `.open` sınıfıyla açılır
+  (CSS geçişi `index.html` içindeki `.ai-chat-panel` kurallarında). Mesajlar `addAIChatMessage()` ile üretilir.
 - **Oturum:** `sessionStorage['ts_admin_auth']` (admin Basic header).
 
 ---

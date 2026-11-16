@@ -3,68 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechnoSupport — Destek ve AI Asistanı</title>
-<link rel="stylesheet" href="style.css">
+<title>TechnoSupport — Destek Merkezi</title>
+<meta name="description" content="TechnoWeb ve FireEye için resmi destek kanalları: e-posta desteği ve AI destekli canlı sohbet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            fontFamily: { sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'] },
+            colors: {
+                brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                navy: '#1e3a8a',
+                ink: '#0f172a'
+            },
+            boxShadow: {
+                card: '0 10px 30px -18px rgba(15, 23, 42, 0.25)',
+                float: '0 18px 40px -12px rgba(30, 58, 138, 0.45)'
+            }
+        }
+    }
+};
+</script>
+<style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+
+    /* AI sohbet paneli açılma animasyonu */
+    .ai-chat-panel {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(18px) scale(0.98);
+        pointer-events: none;
+        transition: opacity .22s ease, transform .28s cubic-bezier(.22, 1, .36, 1), visibility .22s;
+    }
+    .ai-chat-panel.open {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        pointer-events: auto;
+    }
+
+    /* Giriş modalı (app.js tarafından oluşturulur) */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 130;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(2px);
+    }
+    .modal.open { display: flex; }
+
+    /* Sohbet baloncukları */
+    .ai-msg { animation: msgIn .22s ease; }
+    @keyframes msgIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+</style>
 </head>
-<body>
+<body class="bg-[#f8fafc] text-slate-700 antialiased min-h-screen flex flex-col">
 
-<!-- Üst bar -->
-<div class="topbar">
-    <div class="brand" data-i18n-html="brand">Techno<span>Support</span></div>
-    <div class="actions">
-        <button id="themeToggle" class="btn btn-ghost" data-i18n="themeDark">Karanlık Tema</button>
-        <button id="langToggle" class="btn btn-ghost" data-i18n="navLang">Dil: EN</button>
-        <button id="navLoginBtn" class="btn btn-ghost" data-i18n="navLogin">Giriş Yap</button>
-        <button id="navRegisterBtn" class="btn btn-ghost" data-i18n="navRegister">Kaydol</button>
-        <button id="navLogoutBtn" class="btn btn-primary" data-i18n="navLogout" style="display:none;">Çıkış</button>
+<!-- === Üst bar === -->
+<header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-5">
+        <a href="index.html" class="flex shrink-0 items-center gap-2">
+            <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white shadow-sm">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.4-2.4 2.3-2.3Z"/></svg>
+            </span>
+            <span class="text-[0.95rem] font-extrabold tracking-tight text-navy sm:text-[1.05rem]" data-i18n-html="brand">Techno<span class="text-brand-600">Support</span></span>
+        </a>
+
+        <nav class="ml-auto flex items-center gap-1 sm:gap-2.5">
+            <a href="#destek" class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 sm:block" data-i18n="navSupport">Destek</a>
+            <a href="#talepler" class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 sm:block" data-i18n="navMyTickets">Taleplerim</a>
+            <button type="button" id="langToggle" class="rounded-lg border border-slate-200 px-2 py-2 text-[11px] font-semibold text-slate-500 transition hover:border-brand-600 hover:text-brand-600 sm:px-2.5 sm:text-xs" data-i18n="navLang">Dil: EN</button>
+            <button type="button" id="navLoginBtn" class="rounded-xl px-2 py-2 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:px-3 sm:text-sm" data-i18n="navLogin">Giriş Yap</button>
+            <button type="button" id="navRegisterBtn" class="rounded-xl bg-brand-600 px-2.5 py-2 text-[13px] font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:px-3.5 sm:text-sm" data-i18n="navRegister">Kaydol</button>
+            <button type="button" id="navLogoutBtn" class="hidden rounded-xl bg-slate-900 px-2.5 py-2 text-[13px] font-semibold text-white transition hover:bg-slate-800 sm:px-3.5 sm:text-sm" data-i18n="navLogout">Çıkış</button>
+        </nav>
+    </div>
+</header>
+
+<main class="mx-auto w-full max-w-6xl flex-1 px-5">
+
+    <!-- === Hero === -->
+    <section class="pt-14 pb-10 text-center sm:pt-20 sm:pb-12">
+        <h1 class="mx-auto max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-[2.6rem] sm:leading-[1.15]" data-i18n="heroTitle">
+            Resmi destek kanallarımızdan bize ulaşın
+        </h1>
+        <p class="mx-auto mt-4 max-w-xl text-[0.98rem] leading-relaxed text-slate-500" data-i18n="heroSub">
+            Desteğe mi ihtiyacınız var? Size yardımcı olabiliriz. İhtiyacınıza uygun kanalı seçin.
+        </p>
+
+        <div class="mt-7 flex justify-center">
+            <div class="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
+                <span class="text-[0.82rem] font-medium text-slate-500" data-i18n="statusOk">Tüm sistemler çalışıyor</span>
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70"></span>
+                    <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- === Destek kartları === -->
+    <section id="destek" class="grid gap-5 pb-14 md:grid-cols-2 scroll-mt-24">
+
+        <!-- Sol: E-posta desteği -->
+        <article class="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-7 shadow-card transition hover:-translate-y-0.5 hover:shadow-lg sm:p-8">
+            <div class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6 9 6.5L21 6"/></svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900" data-i18n="emailCardTitle">Geleneksel e-posta desteği</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-500" data-i18n="emailCardSub">Ekibimize doğrudan yazın; talebiniz kayıt altına alınır ve e-posta ile yanıtlanır.</p>
+            <ul class="mt-5 space-y-3 text-sm text-slate-600">
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="emailBullet1">Genellikle 24 saat içinde yanıt</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="emailBullet2">FireEye hesabı ve cihaz kurulumu</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="emailBullet3">Faturalama ve lisans soruları</span>
+                </li>
+            </ul>
+            <div class="mt-7 flex flex-1 items-end justify-center">
+                <a href="mailto:technostudios11@gmail.com" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand-600 px-5 py-3 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 sm:w-auto" data-i18n="emailBtn">
+                    E-posta ile ulaşın
+                </a>
+            </div>
+        </article>
+
+        <!-- Sağ: Canlı destek -->
+        <article class="relative flex flex-col overflow-hidden rounded-2xl border border-brand-700/20 bg-gradient-to-b from-[#1e3a8a] to-[#172554] p-7 text-white shadow-float sm:p-8">
+            <div class="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-brand-500/20 blur-2xl"></div>
+            <div class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/20">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z"/></svg>
+            </div>
+            <h2 class="relative text-lg font-bold" data-i18n="liveCardTitle">Techno Support Canlı</h2>
+            <p class="relative mt-2 text-sm leading-relaxed text-blue-100/90" data-i18n="liveCardSub">AI destek asistanımız anında yanıt verir; karmaşık konularda ekibimiz devreye girer.</p>
+            <ul class="relative mt-5 space-y-3 text-sm text-blue-50/90">
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="liveBullet1">AI asistan anında yanıt verir</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="liveBullet2">Kurulum, APK ve panel soruları</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span data-i18n="liveBullet3">Hafta içi 09:00–18:00 insan desteği</span>
+                </li>
+            </ul>
+            <div class="relative mt-7 flex flex-1 items-end justify-center">
+                <button type="button" id="openChatBtn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-navy shadow-sm transition hover:bg-blue-50" data-i18n="liveBtn">
+                    Bizimle sohbet edin
+                </button>
+            </div>
+        </article>
+    </section>
+
+    <!-- === Destek talepleri === -->
+    <section id="talepler" class="pb-16 scroll-mt-24">
+        <div class="mb-5 flex flex-col gap-1 sm:mb-6">
+            <h2 class="text-xl font-bold tracking-tight text-slate-900" data-i18n="ticketsTitle">Destek talebi oluşturun</h2>
+            <p class="text-sm text-slate-500" data-i18n="ticketsSub">Formu doldurun; talebiniz kaydedilir ve ekibimiz sizinle iletişime geçer.</p>
+        </div>
+
+        <div class="grid gap-5 lg:grid-cols-5">
+            <!-- Form -->
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card sm:p-7 lg:col-span-3">
+                <form id="ticketForm" class="grid gap-3.5 sm:grid-cols-2">
+                    <div class="sm:col-span-1">
+                        <label for="ticketName" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="nameLabel">Ad Soyad</label>
+                        <input type="text" id="ticketName" autocomplete="name" required
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                            data-i18n-placeholder="namePlaceholder" placeholder="Ad Soyad">
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label for="ticketEmail" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="emailLabel">E-posta</label>
+                        <input type="email" id="ticketEmail" autocomplete="email" required
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                            data-i18n-placeholder="emailPlaceholder" placeholder="ornek@eposta.com">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="ticketSubject" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="subjectLabel">Konu</label>
+                        <input type="text" id="ticketSubject" required
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                            data-i18n-placeholder="subjectPlaceholder" placeholder="Konu">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="ticketMessage" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="messageLabel">Mesajınız</label>
+                        <textarea id="ticketMessage" required rows="5"
+                            class="w-full resize-y rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                            data-i18n-placeholder="messagePlaceholder" placeholder="Mesajınızı yazın..."></textarea>
+                    </div>
+                    <div class="sm:col-span-2 flex items-center justify-between gap-3 pt-1">
+                        <p class="hidden text-xs text-slate-400 sm:block" data-i18n="ticketPrivacy">Bilgileriniz yalnızca destek amacıyla kullanılır.</p>
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:w-auto" data-i18n="sendTicket">Talebi Gönder</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Liste -->
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card sm:p-7 lg:col-span-2">
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500" data-i18n="listTitle">Son talepler</h3>
+                    <span class="inline-flex h-2 w-2 rounded-full bg-brand-600"></span>
+                </div>
+                <div id="ticketList" class="space-y-2.5"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- === Alt bilgi === -->
+<footer class="border-t border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-5 py-6 text-center sm:flex-row sm:text-left">
+        <p class="text-xs text-slate-400" data-i18n="footerNote">© TechnoWeb — TechnoSupport destek merkezi</p>
+        <div class="flex items-center gap-4 text-xs">
+            <a href="https://www.technoweb.win" class="font-medium text-slate-500 transition hover:text-brand-600">technoweb.win</a>
+            <a href="mailto:technostudios11@gmail.com" class="font-medium text-slate-500 transition hover:text-brand-600" data-i18n="footerMail">E-posta</a>
+        </div>
+    </div>
+</footer>
+
+<!-- === AI Sohbet Paneli === -->
+<div id="aiChatPanel" class="ai-chat-panel fixed bottom-24 right-5 z-[95] flex h-[560px] max-h-[calc(100vh-8rem)] w-[380px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-900/5">
+
+    <!-- Başlık -->
+    <div class="relative bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-slate-900 px-5 py-4 text-white">
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <div class="grid h-10 w-10 place-items-center rounded-full bg-white/15 text-lg ring-1 ring-white/25">🤖</div>
+                <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#1e3a8a] bg-emerald-400"></span>
+            </div>
+            <div class="min-w-0 flex-1">
+                <div class="truncate text-sm font-bold" data-i18n="chatTitle">AI Destek Asistanı</div>
+                <div class="flex items-center gap-1.5 text-[0.72rem] text-blue-100/80">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    <span data-i18n="chatOnline">Çevrimiçi · anında yanıt</span>
+                </div>
+            </div>
+            <button type="button" id="aiCloseBtn" class="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/90 transition hover:bg-white/20" title="Kapat" data-i18n-title="close">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mesajlar -->
+    <div id="aiChatMessages" class="flex-1 space-y-3 overflow-y-auto bg-slate-50/80 px-4 py-4"></div>
+
+    <!-- Giriş -->
+    <div class="border-t border-slate-100 bg-white px-3 pb-2 pt-3">
+        <div class="flex items-center gap-2">
+            <input type="text" id="aiChatInput"
+                class="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                data-i18n-placeholder="chatPlaceholder" placeholder="Bize mesaj gönderin">
+            <button type="button" id="aiChatSend"
+                class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white shadow-sm transition hover:bg-brand-700 active:scale-95"
+                title="Gönder" data-i18n-title="send">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </button>
+        </div>
+
+        <!-- Alt navigasyon -->
+        <div class="mt-2 flex items-center justify-around border-t border-slate-100 pt-1.5 text-[0.68rem] font-medium text-slate-400">
+            <span class="flex items-center gap-1.5 rounded-lg px-2 py-1 text-brand-600">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2Z"/></svg>
+                <span data-i18n="navHome">Ana Sayfa</span>
+            </span>
+            <span class="flex items-center gap-1.5 rounded-lg px-2 py-1">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z"/></svg>
+                <span data-i18n="navMessages">Mesajlar</span>
+            </span>
+        </div>
     </div>
 </div>
 
-<div class="container">
-
-    <!-- Sol panel: Destek talepleri (geniş) -->
-    <div class="left-panel">
-        <div class="card">
-            <h2 data-i18n="myTickets">Taleplerim</h2>
-            <button class="btn btn-primary" id="newTicketBtn" data-i18n="newTicket">Yeni Talep Aç</button>
-            <div class="hint" style="margin-top:8px;">Destek talebinizi oluşturmak için formu doldurun.</div>
-
-            <form id="ticketForm" class="ticket-form" style="margin-top:14px;">
-                <input type="text" id="ticketName" data-i18n-placeholder="namePlaceholder" required>
-                <input type="email" id="ticketEmail" data-i18n-placeholder="emailPlaceholder" required>
-                <input type="text" id="ticketSubject" data-i18n-placeholder="subjectPlaceholder" required>
-                <textarea id="ticketMessage" data-i18n-placeholder="messagePlaceholder" required></textarea>
-                <button type="submit" class="btn btn-primary" data-i18n="sendTicket">Talebi Gönder</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2 data-i18n="navTickets">Destek Talepleri</h2>
-            <div id="ticketList" class="ticket-list"></div>
-        </div>
-    </div>
-
-</div>
-
-<!-- === AI Sohbet Penceresi (kapalı olarak başlar) === -->
-<div id="aiChatPanel" class="ai-chat-panel">
-    <div class="ai-chat-header">
-        <div class="ai-chat-title" data-i18n="chatTitle">AI Destek Asistanı</div>
-        <div class="ai-chat-controls">
-            <button id="aiCloseBtn" class="ai-icon-btn" title="Kapat">✕</button>
-        </div>
-    </div>
-    <div id="aiChatMessages" class="ai-chat-body"></div>
-    <div class="ai-chat-footer">
-        <input type="text" id="aiChatInput" data-i18n-placeholder="chatPlaceholder">
-        <button id="aiChatSend" class="ai-send-btn" data-i18n="send">Gönder</button>
-    </div>
-</div>
-
-<!-- === AI Yuvarlak Buton (sabit, her zaman görünür) === -->
-<button id="aiBubbleBtn" class="ai-bubble" title="AI Asistanı">
-    <span class="ai-bubble-icon">🤖</span>
-    <span id="aiBubbleDot" class="ai-bubble-dot"></span>
+<!-- === AI Tetikleyici === -->
+<button type="button" id="aiBubbleBtn" class="group fixed bottom-6 right-5 z-[96] grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-brand-600 to-navy text-white shadow-float transition hover:scale-105 active:scale-95" title="AI Asistanı">
+    <span class="ai-bubble-icon text-2xl transition group-hover:rotate-6">🤖</span>
+    <span id="aiBubbleDot" class="ai-bubble-dot active absolute right-1 top-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-amber-400"></span>
 </button>
 
 <script src="app.js"></script>
