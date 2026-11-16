@@ -29,6 +29,7 @@ Kod tabanı **derleme adımı olmayan** statik HTML/CSS/JS + (isteğe bağlı) t
 ├─ style.css            # Tema, responsive düzen
 ├─ app.js               # i18n, chat mantığı, ticket işlemleri, admin girişi
 ├─ CNAME                # GitHub Pages özel alan adı (support.technoweb.win)
+├─ app.yaml             # Wasmer Edge dağıtım tanımı (canlı site bu dosyadan deploy edilir)
 ├─ .github/workflows/
 │  └─ pages.yml         # GitHub Pages dağıtım workflow'u (push'ta otomatik)
 ├─ AGENTS.md            # Bu dosya
@@ -52,8 +53,11 @@ python -m http.server 8000
 #   npx wrangler deploy
 #   npx wrangler secret put KILO_API
 
-# Site dağıtımı: main'e push → GitHub Actions otomatik olarak Pages'a yayınlar
+# Site dağıtımı: main'e push → GitHub Actions (Pages) ve Wasmer otomatik yayınlar
 git push origin main
+
+# Wasmer'dan manuel deploy (gerekirse)
+wasmer deploy --owner ereny116011-cloud --app-name technosupport
 ```
 
 ---
