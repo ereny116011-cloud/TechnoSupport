@@ -1,10 +1,15 @@
-apiVersion: wasmer.io/v1
 kind: wasmer.io/App.v1
-metadata:
+package: wasmer/static-web-server@1.1.0
+meta:
   name: technosupport
+  owner: ereny116011-cloud
 spec:
+  package: wasmer/static-web-server@1.1.0
   domains:
     - support.technoweb.win
+  locality:
+    regions:
+      - fr-roub1
   build:
     provider: anybuild
     engine: staticfile
