@@ -1,5 +1,5 @@
 apiVersion: wasmer.io/v1
-kind: App
+kind: wasmer.io/App.v1
 metadata:
   name: technosupport
 spec:
