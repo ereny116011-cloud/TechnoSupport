@@ -297,12 +297,12 @@ let lang = localStorage['ts-lang'] || 'tr';
 let theme = localStorage['ts-theme'] || 'light';
 let WORKER_URL = 'https://fireeye-api.ereny116011.workers.dev';
 
-// OAuth sağlayıcı kimlikleri (Google Cloud Console / Azure Portal / GitHub Settings)
+// OAuth sağlayıcı kimlikleri (FireEye web paneliyle aynıdır)
 // Boş bırakılan sağlayıcının butonu otomatik gizlenir.
 const OAUTH_CLIENTS = {
-    google: 'YOUR_GOOGLE_CLIENT_ID',
-    microsoft: 'YOUR_MICROSOFT_CLIENT_ID',
-    github: 'YOUR_GITHUB_CLIENT_ID'
+    google: '338929445809-7vo236tf9shv0ih6ds7u604m412o6ffl.apps.googleusercontent.com',
+    microsoft: '37f732b9-1256-41ac-ad50-d432674cf06d',
+    github: 'Ov23lihLLn5WcjBIuG4Y'
 };
 
 // AI asistanına TechnoWeb / FireEye bilgi tabanı (Worker tarafına system prompt olarak gönderilir).
