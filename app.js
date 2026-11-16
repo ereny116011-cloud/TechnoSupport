@@ -39,6 +39,8 @@ const FE_I18N = {
         adminReply: 'Yanıtla',
         adminClose: 'Kapat',
         adminOpen: 'Aç',
+        adminDelete: 'Sil',
+        adminDeleteConfirm: 'Bu destek talebi kalıcı olarak silinecek. Onaylıyor musunuz?',
         adminNoTickets: 'Henüz destek talebi yok.',
         from: 'Müşteri',
         admin: 'Yetkili',
@@ -85,6 +87,8 @@ const FE_I18N = {
         adminReply: 'Reply',
         adminClose: 'Close',
         adminOpen: 'Open',
+        adminDelete: 'Delete',
+        adminDeleteConfirm: 'This support ticket will be permanently deleted. Do you confirm?',
         adminNoTickets: 'No support tickets yet.',
         from: 'Customer',
         admin: 'Agent',
@@ -230,6 +234,19 @@ async function setTicketStatus(id, status) {
             body: JSON.stringify({ status: status })
         });
         if (!res.ok) throw new Error('Durum değiştirilemedi');
+        return await res.json();
+    } catch (e) {
+        throw e;
+    }
+}
+
+async function deleteTicket(id) {
+    try {
+        const res = await fetch(WORKER_URL + '/api/support/tickets/' + id, {
+            method: 'DELETE',
+            headers: { ...getAdminAuthHeader() }
+        });
+        if (!res.ok) throw new Error('Ticket silinemedi');
         return await res.json();
     } catch (e) {
         throw e;
@@ -395,7 +412,8 @@ if (adminTicketList) {
                 '<textarea class="reply-input" id="reply-' + tick.id + '" placeholder="' + t('adminReply') + '..."></textarea>' +
                 '<button class="btn btn-primary" data-id="' + tick.id + '" data-action="reply">' + t('adminReply') + '</button> ' +
                 '<button class="btn btn-ghost" data-id="' + tick.id + '" data-action="' + (tick.status === 'open' ? 'close' : 'open') + '">' +
-                (tick.status === 'open' ? t('adminClose') : t('adminOpen')) + '</button>' +
+                (tick.status === 'open' ? t('adminClose') : t('adminOpen')) + '</button> ' +
+                '<button class="btn btn-danger" data-id="' + tick.id + '" data-action="delete">' + t('adminDelete') + '</button>' +
                 '</td>';
             adminTicketList.appendChild(tr);
         });
@@ -414,6 +432,9 @@ if (adminTicketList) {
                         ta.value = '';
                     } else if (action === 'close' || action === 'open') {
                         await setTicketStatus(id, action === 'close' ? 'closed' : 'open');
+                    } else if (action === 'delete') {
+                        if (!confirm(t('adminDeleteConfirm'))) return;
+                        await deleteTicket(id);
                     }
                     renderAdmin();
                 } catch (e) {

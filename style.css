@@ -110,6 +110,18 @@ button {
     background: #f3f4f6;
 }
 
+.btn-danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.btn-danger:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
 /* === Ana düzen === */
 .container {
     max-width: 1000px;
