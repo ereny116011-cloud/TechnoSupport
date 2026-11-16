@@ -16,4 +16,4 @@ spec:
     root: .
   volumes:
     - name: support-data
-    mount: /opt/static_app/data
+      mount: /opt/static_app/data
