@@ -71,12 +71,24 @@ Kullanıcı ──► Destek talebi açar ──► POST /api/tickets (Worker)
 Yetkili ──► admin.html ──► Giriş (Worker) ──► Talepleri görür, yanıt yazar, kapatır
 ```
 
+- **Kimlik doğrulama (kullanıcı):** FireEye worker'ının `/login`, `/register`, `/login/2fa`,
+  `/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification`, `/me`,
+  `/user/update-credentials`, `/2fa/*` uçları kullanılır. Oturum `localStorage['fireeye_user']`
+  içinde `{ token, user }` olarak tutulur (FireEye web paneliyle aynı anahtar).
+- **OAuth (Google / Microsoft / GitHub):** `app.js` içindeki `OAUTH_CLIENTS` sabiti client ID'leri tutar.
+  Boş bırakılan (`YOUR_...`) sağlayıcının butonu otomatik gizlenir.
+  - Google → Google Identity Services (`accounts.google.com/gsi/client`), ID token → `POST /api/support/auth/google`
+  - Microsoft → popup OAuth, `code` → `POST /api/support/auth/microsoft`
+  - GitHub → popup OAuth, `code` → `POST /api/support/auth/github`
+  OAuth geri dönüşü `oauth/callback.html` sayfasında işlenir (token `localStorage`'a yazılır).
 - **Kimlik doğrulama (admin):** `POST /api/support/auth/login` → Worker `env.ADMIN_USER` / `env.ADMIN_PASS` ile doğrular.
   Frontend yalnızca `sessionStorage['ts_admin_auth']` (Basic header) tutar; credential frontend'de **yoktur**.
 - **Tema:** Varsayılan açık; `localStorage['ts-theme']` (`light`/`dark`).
 - **Dil:** `localStorage['ts-lang']` (`tr`/`en`).
 - **Worker URL:** `app.js` içinde sabit (`WORKER_URL`). Kullanıcı tarafından değiştirilemez.
 - **API anahtarı:** Yalnızca Worker secret'ında (`KILO_API`). Tarayıcıya asla çıkmaz.
+- **Cache:** `index.html` içinde `app.js?v=YYYYMMDD` sürüm parametresi kullanılır; `app.js`
+  değiştiğinde bu değeri güncelleyin (tarayıcı cache'i eski sürümü göstermesin).
 - **Dosya kodlaması:** UTF-8, BOM yok. Çoğu dosya CRLF; `wrangler.toml` LF.
 
 ---
@@ -86,14 +98,24 @@ Yetkili ──► admin.html ──► Giriş (Worker) ──► Talepleri gör�
 Taban adres: `https://fireeye-api.ereny116011.workers.dev`
 
 Herkese açık:
-- `GET /api/support/tickets` — Destek talepleri listesi
-- `POST /api/support/tickets` — Yeni destek talebi oluştur
-- `POST /api/support/ai/chat` — AI sohbet proxy'si (Kilo Gateway + Nemotron, `KILO_API` secret ile)
+- `GET /api/support/tickets` — Kendi destek taleplerim (Bearer token gerekli)
+- `POST /api/support/tickets` — Yeni destek talebi (Bearer token gerekli)
+- `POST /api/support/ai/chat` — AI sohbet proxy'si (Kilo Gateway + Nemotron, `KILO_API` secret ile) — **giriş gerekmez**
 - `POST /api/support/auth/login` — Admin girişi (kullanıcı adı/şifre doğrulaması)
 - `GET /api/support/auth/me` — Oturum durumu
+- `POST /api/support/auth/google` — Google OAuth (gövde: `{ credential }` — ID token)
+- `POST /api/support/auth/microsoft` — Microsoft OAuth (gövde: `{ code }`)
+- `POST /api/support/auth/github` — GitHub OAuth (gövde: `{ code }`)
+
+FireEye kullanıcı uçları (site ve Android uygulaması ortak kullanır):
+- `POST /login`, `POST /register`, `POST /login/2fa`, `GET /me`
+- `POST /forgot-password`, `POST /reset-password`, `POST /verify-email`, `POST /resend-verification`
+- `GET /2fa/status`, `POST /2fa/setup`, `POST /2fa/enable`, `POST /2fa/disable`
+- `PUT /user/update-credentials`
 
 Admin (Basic auth gerekli):
 - `PATCH /api/support/tickets/:id` — Yanıt ekle / durum değiştir
+- `DELETE /api/support/tickets/:id` — Talebi sil
 
 ---
 
