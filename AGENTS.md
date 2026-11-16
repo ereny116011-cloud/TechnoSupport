@@ -11,10 +11,11 @@ Kod tabanı **derleme adımı olmayan** statik HTML/CSS/JS + (isteğe bağlı) t
 - **AI Destek Sohbeti:** Siteye yerleştirilmiş sohbet widget'ı (sağ altta yuvarlak 🤖 butonu, tıklanınca sağdan açılır).
   Gerçek AI **Kilo Gateway** üzerinden `nvidia/nemotron-3.5-super-vl:free` modeliyle çalışır.
   API anahtarı Worker secret'ında (`KILO_API`) tutulur, kullanıcı girmez.
-- **Destek Talepleri:** Kullanıcılar talep açar; admin yetkilisi Worker API üzerinden görüp yanıtlar.
+- **Destek Talepleri:** Kullanıcılar talep açar; admin yetkilisi API üzerinden görüp yanıtlar.
 - **Admin Paneli:** `admin.html` — FireEye ile aynı hesap (`TechnoStudios11` / `giradmine`).
-  Kimlik doğrulaması **Worker'da** yapılır (`/api/auth/login`), frontend'de credential yoktur.
-- **Backend:** `worker/index.js` — AI proxy + ticket API + admin auth (Cloudflare Worker).
+  Kimlik doğrulaması **Worker'da** yapılır, frontend'de credential yoktur.
+- **Backend:** FireEye worker'ı ile **birleştirildi** — `TechnoStudios` reposundaki
+  `cloudflare-worker/src/index.js` içindeki `/api/support/*` uçları.
 - **Barındırma:** GitHub Pages (Actions workflow) + `support.technoweb.win` (CNAME).
 
 ---
@@ -30,15 +31,13 @@ Kod tabanı **derleme adımı olmayan** statik HTML/CSS/JS + (isteğe bağlı) t
 ├─ CNAME                # GitHub Pages özel alan adı (support.technoweb.win)
 ├─ .github/workflows/
 │  └─ pages.yml         # GitHub Pages dağıtım workflow'u (push'ta otomatik)
-├─ worker/
-│  └─ index.js          # Cloudflare Worker: AI proxy + ticket API + auth
-├─ wrangler.toml        # Worker yapılandırması
 ├─ AGENTS.md            # Bu dosya
 └─ .gitignore           # node_modules, .dev.vars, .wrangler, vs.
 ```
 
-**Yok:** build script'i, test, linter, framework, `data/` klasörü (tiketler Worker API'de tutulur).
-Bu yüzden doğrulama manueldir.
+**Yok:** build script'i, test, linter, framework, `worker/` klasörü.
+Backend, FireEye worker'ı ile birleştirildiği için bu depoda Worker kodu **yoktur**;
+`TechnoStudios` reposundaki `cloudflare-worker/src/index.js` içinde `/api/support/*` uçları olarak yaşar.
 
 ---
 
@@ -48,13 +47,10 @@ Bu yüzden doğrulama manueldir.
 # Statik site için build yok: dosyaları düzenleyip doğrudan tarayıcıda açın
 python -m http.server 8000
 
-# Cloudflare Worker (AI proxy + ticket API) yerel test
-cd worker
-npm install
-npx wrangler dev
-
-# Worker deploy
-npx wrangler deploy
+# Backend değişiklikleri TechnoStudios reposunda yapılır:
+#   cd ..\TechnoStudios\cloudflare-worker
+#   npx wrangler deploy
+#   npx wrangler secret put KILO_API
 
 # Site dağıtımı: main'e push → GitHub Actions otomatik olarak Pages'a yayınlar
 git push origin main
@@ -81,26 +77,27 @@ Yetkili ──► admin.html ──► Giriş (Worker) ──► Talepleri gör�
 
 ---
 
-## 5. API uçları (Worker / worker/index.js)
+## 5. API uçları (FireEye worker'ı — `cloudflare-worker/src/index.js`)
+
+Taban adres: `https://fireeye-api.ereny116011.workers.dev`
 
 Herkese açık:
-- `GET /api/health` — Servis sağlık kontrolü
-- `GET /api/tickets` — Destek talepleri listesi
-- `POST /api/tickets` — Yeni destek talebi oluştur
-- `POST /api/ai/chat` — AI sohbet proxy'si (Kilo Gateway + Nemotron, `KILO_API` secret ile)
-- `POST /api/auth/login` — Admin girişi (kullanıcı adı/şifre doğrulaması)
-- `POST /api/auth/register` — Yeni kayıt (şu anda devre dışı)
-- `GET /api/auth/me` — Oturum durumu
+- `GET /api/support/tickets` — Destek talepleri listesi
+- `POST /api/support/tickets` — Yeni destek talebi oluştur
+- `POST /api/support/ai/chat` — AI sohbet proxy'si (Kilo Gateway + Nemotron, `KILO_API` secret ile)
+- `POST /api/support/auth/login` — Admin girişi (kullanıcı adı/şifre doğrulaması)
+- `GET /api/support/auth/me` — Oturum durumu
 
 Admin (Basic auth gerekli):
-- `PATCH /api/tickets/:id` — Yanıt ekle / durum değiştir
+- `PATCH /api/support/tickets/:id` — Yanıt ekle / durum değiştir
 
 ---
 
-## 6. Veritabanı (Worker belleği / D1)
+## 6. Veritabanı (D1 — `fireeye_db`)
 
-Tiketler Worker'ın belleğinde tutulur (`tickets` dizisi). Kalıcılık için D1'e (`technosupport_db`)
-taşınabilir. Şema (örnek):
+Tiketler FireEye worker'ının D1 veritabanında `support_tickets` ve `support_ticket_replies`
+tablolarında tutulur. Tablolar ilk kullanımda worker tarafından kendisi oluşturulur
+(`ensureSupportTables`), migration çalıştırılmasa da sistem çalışır.
 
 ```json
 [
@@ -124,7 +121,7 @@ taşınabilir. Şema (örnek):
 - **Mimari:** `index.html` + `admin.html` + `style.css` + `app.js` (build yok, framework yok).
 - **API anahtarı asla repoya yazılmaz** ve tarayıcıya çıkmaz; yalnızca Worker secret'ında durur.
 - **Worker proxy URL'si kullanıcı tarafından değiştirilemez** (sabit `WORKER_URL`); ayarlar arayüzünde sunulmaz.
-- **Admin credential frontend'de bulunmaz.** Giriş `POST /api/auth/login` ile Worker'da doğrulanır.
+- **Admin credential frontend'de bulunmaz.** Giriş `POST /api/support/auth/login` ile Worker'da doğrulanır.
 - **i18n:** `app.js` içinde `FE_I18N.tr` ve `FE_I18N.en`; metinler `data-i18n` / `data-i18n-placeholder` /
   `data-i18n-html` öznitelikleriyle bağlanır. Yeni metin eklerken **iki dili de** ekleyin.
 - **Kullanıcı kaynaklı metinleri** `escapeHtml()` ile kaçırın.
@@ -145,6 +142,8 @@ Admin yanıtı ticket'ın `replies` dizisine `{ text, author, createdAt }` olara
 
 ## 9. Yapılandırma ve gizli değerler
 
+Secret'lar **FireEye worker'ında** (`fireeye-api`) tanımlıdır:
+
 | Secret | Zorunlu mu | Açıklama |
 |--------|-----------|----------|
 | `KILO_API` | Evet (gerçek AI için) | Kilo Gateway API anahtarı. `npx wrangler secret put KILO_API` ile eklenir. |
@@ -153,7 +152,7 @@ Admin yanıtı ticket'ın `replies` dizisine `{ text, author, createdAt }` olara
 | `ADMIN_USER` | Önerilir | Varsayılan: `TechnoStudios11` |
 | `ADMIN_PASS` | Önerilir | Varsayılan: `giradmine` |
 
-> Secret'ları **asla** repoya yazmayın. `.dev.vars` (yerel) veya `wrangler secret put` (üretim) kullanın.
+> Secret'ları **asla** repoya yazmayın. `wrangler secret put` ile ekleyin.
 
 ---
 
@@ -177,10 +176,10 @@ Her değişiklikten sonra en az:
 3. Özel alan adı `CNAME` dosyasındaki `support.technoweb.win` üzerinden gelir.
    DNS'te CNAME kaydı `support` → `ereny116011-cloud.github.io` olmalıdır.
 
-**Worker (Cloudflare):**
+**Worker (Cloudflare — FireEye worker'ı ile birleşik):**
 
 ```powershell
-cd worker
+cd ..\TechnoStudios\cloudflare-worker
 $env:CLOUDFLARE_ACCOUNT_ID="0280e2748c8ba03638896e72227c2ae9"
 npx wrangler deploy
 npx wrangler secret put KILO_API
@@ -196,7 +195,7 @@ npx wrangler secret put ADMIN_PASS
 
 1. Gerçek "sınırsız ve ücretsiz" AI API'si yoktur; gerçek LLM için Worker'da `KILO_API` secret'ı tanımlı olmalıdır.
 2. Admin oturumu `sessionStorage` ile tutulur (Basic header). Sekmeyi kapatınca oturum biter.
-3. Tiketler Worker belleğinde tutulur — Worker yeniden başlatıldığında silinir. Kalıcılık için D1'e taşıyın.
+3. Tiketler D1'de (`support_tickets`) saklanır; worker yeniden başlatılsa da veriler korunur.
 4. API anahtarı yalnızca Worker secret'ında (`KILO_API`) tutulur; tarayıcıya asla çıkmayacağı için sızdırma riski yoktur.
 5. GitHub Pages'ta `worker/` klasörü yayınlanmaz (workflow yalnızca statik dosyaları `_site` içine kopyalar).
 6. Özel alan adı için DNS CNAME kaydı (`support` → `ereny116011-cloud.github.io`) eklenmelidir.

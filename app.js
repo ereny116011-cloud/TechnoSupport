@@ -99,7 +99,7 @@ const FE_I18N = {
 
 let lang = localStorage['ts-lang'] || 'tr';
 let theme = localStorage['ts-theme'] || 'dark';
-let WORKER_URL = 'https://technosupport-api.ereny116011.workers.dev';
+let WORKER_URL = 'https://fireeye-api.ereny116011.workers.dev';
 
 /* === Tema === */
 function applyTheme() {
@@ -158,7 +158,7 @@ function isAdminLoggedIn() {
 
 async function adminLogin(user, pass) {
     try {
-        const res = await fetch(WORKER_URL + '/api/auth/login', {
+        const res = await fetch(WORKER_URL + '/api/support/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: user, password: pass })
@@ -184,7 +184,7 @@ function adminLogout() {
 /* === Ticket işlemleri (Worker API üzerinden) === */
 async function fetchTickets() {
     try {
-        const res = await fetch(WORKER_URL + '/api/tickets');
+        const res = await fetch(WORKER_URL + '/api/support/tickets');
         if (!res.ok) return [];
         const data = await res.json();
         return data.tickets || [];
@@ -196,7 +196,7 @@ async function fetchTickets() {
 
 async function createTicket(ticket) {
     try {
-        const res = await fetch(WORKER_URL + '/api/tickets', {
+        const res = await fetch(WORKER_URL + '/api/support/tickets', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ticket)
@@ -210,7 +210,7 @@ async function createTicket(ticket) {
 
 async function replyTicket(id, replyText) {
     try {
-        const res = await fetch(WORKER_URL + '/api/tickets/' + id, {
+        const res = await fetch(WORKER_URL + '/api/support/tickets/' + id, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', ...getAdminAuthHeader() },
             body: JSON.stringify({ reply: replyText })
@@ -224,7 +224,7 @@ async function replyTicket(id, replyText) {
 
 async function setTicketStatus(id, status) {
     try {
-        const res = await fetch(WORKER_URL + '/api/tickets/' + id, {
+        const res = await fetch(WORKER_URL + '/api/support/tickets/' + id, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', ...getAdminAuthHeader() },
             body: JSON.stringify({ status: status })
@@ -289,7 +289,7 @@ async function handleAIChatSend() {
     addAIChatMessage(t('typing'), 'system');
 
     try {
-        const res = await fetch(WORKER_URL + '/api/ai/chat', {
+        const res = await fetch(WORKER_URL + '/api/support/ai/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text, lang: lang })
