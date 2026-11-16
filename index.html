@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechnoSupport — Destek ve AI Asistanı</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Üst bar -->
+<div class="topbar">
+    <div class="brand" data-i18n-html="brand">Techno<span>Support</span></div>
+    <div class="actions">
+        <button id="themeToggle" class="btn btn-ghost" data-i18n="themeDark">Karanlık Tema</button>
+        <button id="langToggle" class="btn btn-ghost" data-i18n="navLang">Dil: EN</button>
+        <button id="navLoginBtn" class="btn btn-ghost" data-i18n="navLogin">Giriş Yap</button>
+        <button id="navRegisterBtn" class="btn btn-ghost" data-i18n="navRegister">Kaydol</button>
+        <button id="navLogoutBtn" class="btn btn-primary" data-i18n="navLogout" style="display:none;">Çıkış</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Sol panel: Destek talepleri (geniş) -->
+    <div class="left-panel">
+        <div class="card">
+            <h2 data-i18n="myTickets">Taleplerim</h2>
+            <button class="btn btn-primary" id="newTicketBtn" data-i18n="newTicket">Yeni Talep Aç</button>
+            <div class="hint" style="margin-top:8px;">Destek talebinizi oluşturmak için formu doldurun.</div>
+
+            <form id="ticketForm" class="ticket-form" style="margin-top:14px;">
+                <input type="text" id="ticketName" data-i18n-placeholder="namePlaceholder" required>
+                <input type="email" id="ticketEmail" data-i18n-placeholder="emailPlaceholder" required>
+                <input type="text" id="ticketSubject" data-i18n-placeholder="subjectPlaceholder" required>
+                <textarea id="ticketMessage" data-i18n-placeholder="messagePlaceholder" required></textarea>
+                <button type="submit" class="btn btn-primary" data-i18n="sendTicket">Talebi Gönder</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 data-i18n="navTickets">Destek Talepleri</h2>
+            <div id="ticketList" class="ticket-list"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- === AI Sohbet Penceresi (kapalı olarak başlar) === -->
+<div id="aiChatPanel" class="ai-chat-panel">
+    <div class="ai-chat-header">
+        <div class="ai-chat-title" data-i18n="chatTitle">AI Destek Asistanı</div>
+        <div class="ai-chat-controls">
+            <button id="aiCloseBtn" class="ai-icon-btn" title="Kapat">✕</button>
+        </div>
+    </div>
+    <div id="aiChatMessages" class="ai-chat-body"></div>
+    <div class="ai-chat-footer">
+        <input type="text" id="aiChatInput" data-i18n-placeholder="chatPlaceholder">
+        <button id="aiChatSend" class="ai-send-btn" data-i18n="send">Gönder</button>
+    </div>
+</div>
+
+<!-- === AI Yuvarlak Buton (sabit, her zaman görünür) === -->
+<button id="aiBubbleBtn" class="ai-bubble" title="AI Asistanı">
+    <span class="ai-bubble-icon">🤖</span>
+    <span id="aiBubbleDot" class="ai-bubble-dot"></span>
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>

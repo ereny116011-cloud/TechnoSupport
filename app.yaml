@@ -1,0 +1,10 @@
+name: technosupport
+domains:
+  - support.technoweb.win
+build:
+  provider: anybuild
+  engine: staticfile
+  root: .
+volumes:
+  - name: support-data
+    mount: /opt/static_app/data

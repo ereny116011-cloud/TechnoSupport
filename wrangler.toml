@@ -1,0 +1,12 @@
+name = "technosupport-api"
+compatibility_date = "2026-11-13"
+main = "worker/index.js"
+
+[vars]
+KILO_API_BASE = "https://ai-gateway.kilo.ai/api/v1"
+KILO_MODEL = "nvidia/nemotron-3.5-super-vl:free"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "technosupport_db"
+database_id = ""

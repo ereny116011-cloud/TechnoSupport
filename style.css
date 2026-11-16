@@ -1,0 +1,648 @@
+/* TechnoSupport — Statik site stilleri */
+/* UTF-8, BOM yok, CRLF */
+
+/* === Temel === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fb;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* === Üst bar === */
+.topbar {
+    background: #fff;
+    color: #1f2937;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.topbar .brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar .brand::before {
+    content: '🔧';
+    font-size: 1.5rem;
+}
+
+.topbar .brand span {
+    color: #2563eb;
+}
+
+.topbar .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background: #fff;
+    color: #374151;
+    transition: all 0.15s;
+}
+
+.btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #f3f4f6;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.btn-ghost {
+    background: transparent;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.btn-ghost:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #f3f4f6;
+}
+
+/* === Ana düzen === */
+.container {
+    max-width: 1000px;
+    margin: 28px auto;
+    padding: 0 16px;
+}
+
+/* === Sol panel: Destek talepleri === */
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.card h2 {
+    margin-bottom: 16px;
+    font-size: 1.15rem;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card h2::before {
+    content: '📋';
+    font-size: 1.4rem;
+}
+
+.card h2 .badge {
+    background: #e5e7eb;
+    color: #4b5563;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: auto;
+}
+
+.ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ticket-form input,
+.ticket-form textarea,
+.ticket-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+.ticket-form input:focus,
+.ticket-form textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.ticket-form textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ticket-item {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.ticket-item:hover {
+    border-color: #2563eb;
+    background: #f3f4f6;
+    transform: translateX(3px);
+}
+
+.ticket-item strong {
+    color: #111827;
+}
+
+.ticket-item .meta {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+.empty {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    padding: 22px;
+}
+
+/* === AI Sohbet Penceresi (kapalı olarak başlar, sağdan çıkar) === */
+.ai-chat-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: #fff;
+    border-left: 1px solid #e5e7eb;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    z-index: 90;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ai-chat-panel.open {
+    transform: translateX(0);
+}
+
+.ai-chat-header {
+    background: #f9fafb;
+    color: #111827;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ai-chat-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-chat-title::before {
+    content: '💬';
+    font-size: 1.3rem;
+}
+
+.ai-chat-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.ai-icon-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.ai-icon-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.ai-chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9fafb;
+}
+
+.ai-msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    animation: fadeIn 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.ai-msg.user {
+    align-self: flex-end;
+    background: #2563eb;
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+
+.ai-msg.ai {
+    align-self: flex-start;
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-bottom-left-radius: 2px;
+}
+
+.ai-msg.system {
+    align-self: center;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    background: transparent;
+    padding: 3px 0;
+    max-width: 100%;
+    text-align: center;
+    font-style: italic;
+}
+
+.ai-msg .meta {
+    font-size: 0.7rem;
+    opacity: 0.65;
+    margin-top: 3px;
+    display: block;
+}
+
+.ai-chat-footer {
+    padding: 12px 18px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.03);
+}
+
+.ai-chat-footer input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.94rem;
+    background: #fff;
+    outline: none;
+}
+
+.ai-chat-footer input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+
+.ai-send-btn {
+    padding: 10px 18px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.ai-send-btn:hover {
+    background: #1d4ed8;
+}
+
+.ai-send-btn:active {
+    transform: scale(0.97);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === AI Yuvarlak Buton (sabit, her zaman görünür) === */
+.ai-bubble {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    width: 52px;
+    height: 52px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-bubble:hover {
+    transform: scale(1.08);
+    box-shadow: 0 5px 14px rgba(37,99,235,0.45);
+}
+
+.ai-bubble:active {
+    transform: scale(0.92);
+}
+
+.ai-bubble-icon {
+    font-size: 1.6rem;
+}
+
+.ai-bubble-dot {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 9px;
+    height: 9px;
+    background: #f59e0b;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: none;
+}
+
+.ai-bubble-dot.active {
+    display: block;
+    animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.75; }
+    100% { transform: scale(0.8); opacity: 1; }
+}
+
+/* === Admin panel (admin.html) === */
+.admin-topbar {
+    background: #1f2937;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-container {
+    max-width: 1000px;
+    margin: 28px auto;
+    padding: 0 16px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid #e5e7eb;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.admin-table th {
+    background: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+}
+
+.admin-table tr:hover {
+    background: #f9fafb;
+}
+
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-open {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-closed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.reply-box {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    color: #374151;
+}
+
+.reply-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-size: 0.9rem;
+}
+
+/* === Ayarlar modal === */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    border: 1px solid #e5e7eb;
+}
+
+.modal-content h3 {
+    margin-bottom: 14px;
+    color: #111827;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #374151;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-size: 0.94rem;
+    background: #fff;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+/* === Yardımcı === */
+.hint {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+.alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+    border: 1px solid #e5e7eb;
+}
+
+.alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.alert-success {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+/* Tema geçişi */
+body.light {
+    background: #f3f4f6;
+    color: #111827;
+}
+body.light .card,
+body.light .ticket-item {
+    background: #fff;
+}
+
+/* Mobil uyumluluk */
+@media (max-width: 600px) {
+    .ai-chat-panel {
+        width: 100vw;
+    }
+    .container {
+        padding: 0 12px;
+    }
+    .card {
+        padding: 16px;
+    }
+}

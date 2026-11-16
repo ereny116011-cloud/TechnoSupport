@@ -1,0 +1,12 @@
+# TechnoSupport — .gitignore
+node_modules/
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+.DS_Store
+Thumbs.db
+dist/
+build/
+*.log
