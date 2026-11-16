@@ -112,6 +112,7 @@ const FE_I18N = {
         logoutOk: 'Başarıyla çıkış yapıldı.',
         profileTitle: 'Hesap Profili',
         profileEdit: 'Bilgileri Düzenle',
+        profileEditHint: 'E-posta ve şifrenizi güncelleyebilirsiniz. Mevcut şifreniz doğrulama için gereklidir.',
         profileEditSubmit: 'Değişiklikleri Kaydet',
         profileEmail: 'E-posta',
         profileFullName: 'Ad Soyad',
@@ -255,6 +256,7 @@ const FE_I18N = {
         logoutOk: 'Signed out successfully.',
         profileTitle: 'Account Profile',
         profileEdit: 'Edit Details',
+        profileEditHint: 'You can update your email and password. Your current password is required for verification.',
         profileEditSubmit: 'Save Changes',
         profileEmail: 'Email',
         profileFullName: 'Full Name',
@@ -476,7 +478,7 @@ async function feForgotPassword(email) {
     const res = await fetch(WORKER_URL + '/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, resetBaseUrl: window.location.origin + '/index.html' })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) throw new Error(data.message || 'Sıfırlama bağlantısı gönderilemedi.');
@@ -487,7 +489,7 @@ async function feResetPassword(token, newPassword) {
     const res = await fetch(WORKER_URL + '/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: newPassword })
+        body: JSON.stringify({ token, newPassword })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) throw new Error(data.message || 'Şifre sıfırlanamadı.');
@@ -495,22 +497,20 @@ async function feResetPassword(token, newPassword) {
 }
 
 /* === Email Doğrulama === */
-async function feVerifyEmail(email, token) {
-    const res = await fetch(WORKER_URL + '/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, token })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.success) throw new Error(data.message || 'E-posta doğrulanamadı.');
-    return data;
+// Worker GET /verify-email?token=...&redirect=... ile çalışır ve siteye yönlendirir.
+async function feVerifyEmail(token) {
+    const redirect = window.location.origin + '/index.html';
+    const url = WORKER_URL + '/verify-email?token=' + encodeURIComponent(token) +
+        '&redirect=' + encodeURIComponent(redirect);
+    window.location.href = url;
+    return { success: true };
 }
 
-async function feResendVerification(email) {
+async function feResendVerification() {
     const res = await fetch(WORKER_URL + '/resend-verification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        headers: { 'Content-Type': 'application/json', ...getFeAuthHeader() },
+        body: JSON.stringify({ redirect: window.location.origin + '/index.html' })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) throw new Error(data.message || 'Doğrulama kodu gönderilemedi.');
@@ -568,15 +568,34 @@ async function feGetProfile() {
     return data.user;
 }
 
-async function feUpdateCredentials(fullName, currentPassword, newPassword) {
-    const body = {};
-    if (fullName) body.fullName = fullName;
-    if (currentPassword) body.currentPassword = currentPassword;
-    if (newPassword) body.newPassword = newPassword;
+// Worker PUT /user/update-credentials gövdesi { newEmail, newPassword } bekler.
+// Mevcut şifre önce /login ile doğrulanır, sonra geçici token ile güncelleme yapılır.
+async function feUpdateCredentials(newEmail, currentPassword, newPassword) {
+    const stored = getFeUser();
+    const email = (newEmail || (stored.user && stored.user.email) || '').trim();
+
+    // 1) Mevcut şifre doğrulaması
+    let tempToken = '';
+    if (currentPassword) {
+        const loginRes = await fetch(WORKER_URL + '/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: (stored.user && stored.user.email) || email, password: currentPassword })
+        });
+        const loginData = await loginRes.json().catch(() => ({}));
+        if (!loginData.success || !loginData.token) {
+            throw new Error(loginData.message || 'Mevcut şifre hatalı.');
+        }
+        tempToken = loginData.token;
+    } else {
+        tempToken = stored.token;
+    }
+
+    // 2) Güncelleme
     const res = await fetch(WORKER_URL + '/user/update-credentials', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getFeAuthHeader() },
-        body: JSON.stringify(body)
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tempToken },
+        body: JSON.stringify({ newEmail: email, newPassword: newPassword || '' })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) throw new Error(data.message || 'Güncelleme başarısız.');
@@ -1246,9 +1265,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Yapılandırılmamış OAuth butonlarını gizle
+    const OAUTH_BUTTONS = { google: 'btnGoogleLogin', microsoft: 'btnMicrosoftLogin', github: 'btnGitHubLogin' };
     Object.keys(OAUTH_CLIENTS).forEach(provider => {
         const id = OAUTH_CLIENTS[provider];
-        const btn = document.getElementById('btn' + provider.charAt(0).toUpperCase() + provider.slice(1) + 'Login');
+        const btn = document.getElementById(OAUTH_BUTTONS[provider]);
         if (btn && (!id || id.indexOf('YOUR_') === 0)) {
             btn.classList.add('hidden');
             btn.setAttribute('data-not-configured', '1');
@@ -1340,14 +1360,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         const err = document.getElementById('tsVerifyError');
         err.classList.add('hidden');
-        const email = document.getElementById('tsVerifyEmail').value.trim();
         const token = document.getElementById('tsVerifyToken').value.trim();
-        if (!email || !token) { err.textContent = 'E-posta ve token girin.'; err.classList.remove('hidden'); return; }
+        if (!token) { err.textContent = 'Doğrulama token\'ını girin.'; err.classList.remove('hidden'); return; }
         try {
-            await feVerifyEmail(email, token);
-            showToast('E-posta doğrulandı.');
-            authModal.classList.remove('open');
-            updateAuthUI();
+            // Worker GET /verify-email?token=... ile çalışır; sayfayı yönlendirir.
+            await feVerifyEmail(token);
         } catch (errObj) {
             err.textContent = String(errObj && errObj.message) || 'Doğrulanamadı.';
             err.classList.remove('hidden');
@@ -1357,10 +1374,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('verifyResendBtn')?.addEventListener('click', async () => {
         const err = document.getElementById('tsVerifyError');
         err.classList.add('hidden');
-        const email = document.getElementById('tsVerifyEmail').value.trim();
-        if (!email) { err.textContent = 'E-posta girin.'; err.classList.remove('hidden'); return; }
+        if (!isFeLoggedIn()) {
+            err.textContent = 'Doğrulama e-postası için önce giriş yapın.';
+            err.classList.remove('hidden');
+            return;
+        }
         try {
-            await feResendVerification(email);
+            await feResendVerification();
             showToast('Doğrulama kodu yeniden gönderildi.');
         } catch (errObj) {
             err.textContent = String(errObj && errObj.message) || 'Gönderilemedi.';
@@ -1452,10 +1472,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadProfileEditFields() {
-        const nameEl = document.getElementById('tsEditFullName');
+        const emailEl = document.getElementById('tsEditEmail');
         try {
             const user = await feGetProfile();
-            if (nameEl) nameEl.value = user.fullName || '';
+            if (emailEl) emailEl.value = user.email || '';
         } catch (e) { /* ignore */ }
     }
 
@@ -1468,14 +1488,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const err = document.getElementById('tsProfileEditError');
         const succ = document.getElementById('tsProfileSuccess');
         err.classList.add('hidden'); succ.classList.add('hidden');
-        const fullName = document.getElementById('tsEditFullName').value.trim();
+        const newEmail = document.getElementById('tsEditEmail').value.trim();
         const curPass = document.getElementById('tsEditCurrentPass').value;
         const newPass = document.getElementById('tsEditNewPass').value;
-        if (!fullName && !curPass && !newPass) { err.textContent = 'En az bir alan doldurun.'; err.classList.remove('hidden'); return; }
-        if ((curPass && !newPass) || (!curPass && newPass)) { err.textContent = 'Şifre değişimi için mevcut ve yeni şifre 둘 다 gerekli.'; err.classList.remove('hidden'); return; }
+        if (!newEmail || !curPass || !newPass) {
+            err.textContent = 'E-posta, mevcut şifre ve yeni şifre gerekli.';
+            err.classList.remove('hidden');
+            return;
+        }
         try {
-            await feUpdateCredentials(fullName || undefined, curPass || undefined, newPass || undefined);
-            showAuthSuccess('tsProfileSuccess', 'Profil güncellendi.');
+            await feUpdateCredentials(newEmail, curPass, newPass);
+            showAuthSuccess('tsProfileSuccess', 'Hesap bilgileri güncellendi. Yeni şifrenizle giriş yapın.');
+            // Oturumu yeni e-posta ile tazele
+            const stored = getFeUser();
+            stored.user = Object.assign({}, stored.user, { email: newEmail });
+            localStorage[FE_USER_KEY] = JSON.stringify(stored);
             loadProfile();
             loadProfileEditFields();
         } catch (errObj) {

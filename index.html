@@ -472,24 +472,25 @@ tailwind.config = {
 
         <!-- === PROFİL DÜZENLE === -->
         <form id="tsProfileEditForm" class="hidden space-y-3 auth-step" data-step="profileedit">
+            <p class="text-xs text-slate-500" data-i18n="profileEditHint">E-posta ve şifrenizi güncelleyebilirsiniz. Mevcut şifreniz doğrulama için gereklidir.</p>
             <div>
-                <label for="tsEditFullName" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="fullNameLabel">Ad Soyad</label>
-                <input type="text" id="tsEditFullName" autocomplete="name" required
+                <label for="tsEditEmail" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="emailLabel">E-posta</label>
+                <input type="email" id="tsEditEmail" autocomplete="email" required
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
-                    placeholder="Ad Soyad">
+                    placeholder="ornek@eposta.com">
             </div>
             <div>
                 <label for="tsEditCurrentPass" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="currentPasswordLabel">Mevcut Şifre</label>
-                <input type="password" id="tsEditCurrentPass" required
+                <input type="password" id="tsEditCurrentPass" autocomplete="current-password" required
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
                     placeholder="••••••••">
             </div>
             <div>
                 <label for="tsEditNewPass" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="newPasswordLabel">Yeni Şifre</label>
-                <input type="password" id="tsEditNewPass" minlength="6"
+                <input type="password" id="tsEditNewPass" autocomplete="new-password" required minlength="6"
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
-                    placeholder="Yeni şifre (boş bırakılırsa değişmez)">
-                <p class="mt-1.5 text-[11px] text-slate-400" data-i18n="newPasswordOptional">Boş bırakılırsa şifre değişmez.</p>
+                    placeholder="••••••••">
+                <p class="mt-1.5 text-[11px] text-slate-400" data-i18n="passwordHint">En az 6 karakter.</p>
             </div>
             <p id="tsProfileEditError" class="hidden rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600"></p>
             <button type="submit" class="w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="profileEditSubmit">Değişiklikleri Kaydet</button>
