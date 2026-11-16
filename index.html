@@ -87,6 +87,12 @@ tailwind.config = {
         <nav class="ml-auto flex items-center gap-1 sm:gap-2.5">
             <a href="#destek" class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 sm:block" data-i18n="navSupport">Destek</a>
             <a href="#talepler" class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 sm:block" data-i18n="navMyTickets">Taleplerim</a>
+            <span id="navUserChip" class="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 sm:text-xs">
+                <span class="grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-[10px] text-white">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <span id="navUserName" class="max-w-[7rem] truncate"></span>
+            </span>
             <button type="button" id="langToggle" class="rounded-lg border border-slate-200 px-2 py-2 text-[11px] font-semibold text-slate-500 transition hover:border-brand-600 hover:text-brand-600 sm:px-2.5 sm:text-xs" data-i18n="navLang">Dil: EN</button>
             <button type="button" id="navLoginBtn" class="rounded-xl px-2 py-2 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:px-3 sm:text-sm" data-i18n="navLogin">Giriş Yap</button>
             <button type="button" id="navRegisterBtn" class="rounded-xl bg-brand-600 px-2.5 py-2 text-[13px] font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:px-3.5 sm:text-sm" data-i18n="navRegister">Kaydol</button>
@@ -185,21 +191,35 @@ tailwind.config = {
             <p class="text-sm text-slate-500" data-i18n="ticketsSub">Formu doldurun; talebiniz kaydedilir ve ekibimiz sizinle iletişime geçer.</p>
         </div>
 
-        <div class="grid gap-5 lg:grid-cols-5">
+        <!-- Giriş yapılmadıysa kilit ekranı -->
+        <div id="ticketLocked" class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-card sm:p-12">
+            <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-slate-900" data-i18n="authRequiredTitle">Taleplerinizi görmek için giriş yapın</h3>
+            <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500" data-i18n="authRequiredText">
+                E-posta desteği ve AI asistan giriş olmadan çalışır. Destek talebi açmak ve taleplerinizi takip etmek için FireEye hesabınızla giriş yapın.
+            </p>
+            <button type="button" id="lockedLoginBtn" class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="authRequiredBtn">
+                FireEye ile giriş yap
+            </button>
+            <p class="mt-3 text-xs text-slate-400">
+                <span data-i18n="noAccount">Hesabınız yok mu?</span>
+                <button type="button" id="lockedRegisterBtn" class="font-semibold text-brand-600 hover:underline" data-i18n="registerLink">Kaydol</button>
+            </p>
+        </div>
+
+        <div id="ticketWorkspace" class="hidden grid gap-5 lg:grid-cols-5">
             <!-- Form -->
             <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card sm:p-7 lg:col-span-3">
                 <form id="ticketForm" class="grid gap-3.5 sm:grid-cols-2">
-                    <div class="sm:col-span-1">
-                        <label for="ticketName" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="nameLabel">Ad Soyad</label>
-                        <input type="text" id="ticketName" autocomplete="name" required
-                            class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
-                            data-i18n-placeholder="namePlaceholder" placeholder="Ad Soyad">
-                    </div>
-                    <div class="sm:col-span-1">
-                        <label for="ticketEmail" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="emailLabel">E-posta</label>
-                        <input type="email" id="ticketEmail" autocomplete="email" required
-                            class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
-                            data-i18n-placeholder="emailPlaceholder" placeholder="ornek@eposta.com">
+                    <div class="sm:col-span-2 flex items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/60 px-3.5 py-2.5">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-brand-600" data-i18n="identityLabel">Talep sahibi</p>
+                            <p class="truncate text-sm font-semibold text-slate-800"><span id="ticketIdentityName">—</span></p>
+                            <p class="truncate text-xs text-slate-500" id="ticketIdentityEmail"></p>
+                        </div>
+                        <svg class="h-5 w-5 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                     </div>
                     <div class="sm:col-span-2">
                         <label for="ticketSubject" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="subjectLabel">Konu</label>
@@ -223,7 +243,7 @@ tailwind.config = {
             <!-- Liste -->
             <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card sm:p-7 lg:col-span-2">
                 <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500" data-i18n="listTitle">Son talepler</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500" data-i18n="listTitleMine">Taleplerim</h3>
                     <span class="inline-flex h-2 w-2 rounded-full bg-brand-600"></span>
                 </div>
                 <div id="ticketList" class="space-y-2.5"></div>
@@ -242,6 +262,91 @@ tailwind.config = {
         </div>
     </div>
 </footer>
+
+<!-- === FireEye hesap modalı (giriş / kayıt / 2FA) === -->
+<div id="authModal" class="modal">
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-900/5">
+        <div class="mb-5 flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+                </div>
+                <div>
+                    <h3 id="authTitle" class="text-base font-bold text-slate-900" data-i18n="authTitleLogin">FireEye hesabınızla giriş yapın</h3>
+                    <p id="authSub" class="text-xs text-slate-400" data-i18n="authSubLogin">Destek talebi açmak için giriş yapın.</p>
+                </div>
+            </div>
+            <button type="button" id="authCloseBtn" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200" title="Kapat" data-i18n-title="close">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+        </div>
+
+        <!-- Giriş -->
+        <form id="tsLoginForm" class="space-y-3">
+            <div>
+                <label for="tsLoginEmail" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="emailLabel">E-posta</label>
+                <input type="email" id="tsLoginEmail" autocomplete="email" required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="ornek@eposta.com">
+            </div>
+            <div>
+                <label for="tsLoginPass" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="passwordLabel">Şifre</label>
+                <input type="password" id="tsLoginPass" autocomplete="current-password" required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="••••••••">
+            </div>
+            <p id="tsLoginError" class="hidden rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600"></p>
+            <button type="submit" class="w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="loginSubmit">Giriş Yap</button>
+            <p class="pt-1 text-center text-xs text-slate-400">
+                <span data-i18n="noAccount">Hesabınız yok mu?</span>
+                <button type="button" id="showRegisterBtn" class="font-semibold text-brand-600 hover:underline" data-i18n="registerLink">Kaydol</button>
+            </p>
+        </form>
+
+        <!-- 2FA -->
+        <form id="ts2faForm" class="hidden space-y-3">
+            <p id="ts2faHint" class="text-sm leading-relaxed text-slate-500" data-i18n="twoFactorHint">E-postanıza 6 haneli kod gönderdik.</p>
+            <div>
+                <label for="ts2faCode" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="twoFactorCode">Doğrulama kodu</label>
+                <input type="text" id="ts2faCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-center text-lg font-bold tracking-[0.4em] text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="000000">
+            </div>
+            <p id="ts2faError" class="hidden rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600"></p>
+            <button type="submit" class="w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="verifyBtn">Doğrula</button>
+            <button type="button" id="twoFaBackBtn" class="w-full rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" data-i18n="back">Geri dön</button>
+        </form>
+
+        <!-- Kayıt -->
+        <form id="tsRegisterForm" class="hidden space-y-3">
+            <div>
+                <label for="tsRegisterName" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="fullNameLabel">Ad Soyad</label>
+                <input type="text" id="tsRegisterName" autocomplete="name" required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="Ad Soyad">
+            </div>
+            <div>
+                <label for="tsRegisterEmail" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="emailLabel">E-posta</label>
+                <input type="email" id="tsRegisterEmail" autocomplete="email" required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="ornek@eposta.com">
+            </div>
+            <div>
+                <label for="tsRegisterPass" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="passwordLabel">Şifre</label>
+                <input type="password" id="tsRegisterPass" autocomplete="new-password" required minlength="6"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10"
+                    placeholder="••••••••">
+                <p class="mt-1.5 text-[11px] text-slate-400" data-i18n="passwordHint">En az 6 karakter.</p>
+            </div>
+            <p id="tsRegisterError" class="hidden rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600"></p>
+            <button type="submit" class="w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="registerSubmit">Hesap Oluştur</button>
+            <p class="pt-1 text-center text-xs text-slate-400">
+                <span data-i18n="haveAccount">Zaten hesabınız var mı?</span>
+                <button type="button" id="showLoginBtn" class="font-semibold text-brand-600 hover:underline" data-i18n="loginLink">Giriş yap</button>
+            </p>
+        </form>
+    </div>
+</div>
 
 <!-- === AI Sohbet Paneli === -->
 <div id="aiChatPanel" class="ai-chat-panel fixed bottom-24 right-5 z-[95] flex h-[560px] max-h-[calc(100vh-8rem)] w-[380px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-900/5">

@@ -62,6 +62,30 @@ const FE_I18N = {
         adminLogin: 'Admin Girişi',
         adminLoginSub: 'Yetkili erişimi',
         adminUser: 'Kullanıcı Adı',
+        passwordLabel: 'Şifre',
+        fullNameLabel: 'Ad Soyad',
+        passwordHint: 'En az 6 karakter.',
+        twoFactorCode: 'Doğrulama kodu',
+        twoFactorHint: 'E-postanıza 6 haneli kod gönderdik.',
+        verifyBtn: 'Doğrula',
+        back: 'Geri dön',
+        registerSubmit: 'Hesap Oluştur',
+        loginSubmit: 'Giriş Yap',
+        haveAccount: 'Zaten hesabınız var mı?',
+        loginLink: 'Giriş yap',
+        noAccount: 'Hesabınız yok mu?',
+        registerLink: 'Kaydol',
+        authTitleLogin: 'FireEye hesabınızla giriş yapın',
+        authSubLogin: 'Destek talebi açmak için giriş yapın.',
+        authTitleRegister: 'Yeni hesap oluşturun',
+        authSubRegister: 'TechnoSupport\'ta destek talebi açmak için bir hesap oluşturun.',
+        authRequiredTitle: 'Taleplerinizi görmek için giriş yapın',
+        authRequiredText: 'E-posta desteği ve AI asistan giriş olmadan çalışır. Destek talebi açmak ve taleplerinizi takip etmek için FireEye hesabınızla giriş yapın.',
+        authRequiredBtn: 'FireEye ile giriş yap',
+        identityLabel: 'Talep sahibi',
+        listTitleMine: 'Taleplerim',
+        meFail: 'Oturum bilgisi alınamadı.',
+        logoutOk: 'Başarıyla çıkış yapıldı.',
         adminPass: 'Şifre',
         adminLoginBtn: 'Giriş Yap',
         adminLogout: 'Çıkış',
@@ -143,6 +167,30 @@ const FE_I18N = {
         adminLogin: 'Admin Login',
         adminLoginSub: 'Authorized access only',
         adminUser: 'Username',
+        passwordLabel: 'Password',
+        fullNameLabel: 'Full name',
+        passwordHint: 'At least 6 characters.',
+        twoFactorCode: 'Verification code',
+        twoFactorHint: 'We sent a 6-digit code to your email.',
+        verifyBtn: 'Verify',
+        back: 'Back',
+        registerSubmit: 'Create Account',
+        loginSubmit: 'Login',
+        haveAccount: 'Already have an account?',
+        loginLink: 'Log in',
+        noAccount: "Don't have an account?",
+        registerLink: 'Register',
+        authTitleLogin: 'Sign in with your FireEye account',
+        authSubLogin: 'Sign in to open a support ticket.',
+        authTitleRegister: 'Create new account',
+        authSubRegister: 'Create an account to open support tickets on TechnoSupport.',
+        authRequiredTitle: 'Sign in to view your tickets',
+        authRequiredText: 'Email support and AI assistant work without signing in. To open a support ticket and track your tickets, sign in with your FireEye account.',
+        authRequiredBtn: 'Sign in with FireEye',
+        identityLabel: 'Ticket owner',
+        listTitleMine: 'My tickets',
+        meFail: 'Failed to load session.',
+        logoutOk: 'Signed out successfully.',
         adminPass: 'Password',
         adminLoginBtn: 'Login',
         adminLogout: 'Logout',
@@ -274,33 +322,121 @@ function adminLogout() {
     sessionStorage.removeItem('ts_admin_auth');
 }
 
-/* === Ticket işlemleri (Worker API üzerinden) === */
-async function fetchTickets() {
+/* === FireEye hesap oturumu (aynı /login, /register, /login/2fa uçları) === */
+const FE_USER_KEY = 'fireeye_user';
+
+function getFeUser() {
     try {
-        const res = await fetch(WORKER_URL + '/api/support/tickets');
+        return JSON.parse(localStorage[FE_USER_KEY] || '{}');
+    } catch (e) { return {}; }
+}
+
+function setFeUser(token, user) {
+    localStorage[FE_USER_KEY] = JSON.stringify({ token, user });
+    updateAuthUI();
+}
+
+function clearFeUser() {
+    localStorage.removeItem(FE_USER_KEY);
+    updateAuthUI();
+}
+
+function isFeLoggedIn() {
+    return !!(getFeUser().token && getFeUser().user);
+}
+
+async function feLogin(email, password) {
+    const res = await fetch(WORKER_URL + '/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.success) throw new Error(data.message || 'Giriş başarısız.');
+    if (data.requires2fa) {
+        return { requires2fa: true, challenge: data.challenge, email: data.email };
+    }
+    const user = Object.assign({}, data.user, { devices: data.device ? [data.device] : [] });
+    setFeUser(data.token, user);
+    return { ok: true, user };
+}
+
+async function feLogin2fa(challenge, code) {
+    const res = await fetch(WORKER_URL + '/login/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challenge, code })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.success) throw new Error(data.message || 'Kod doğrulanamadı.');
+    const user = Object.assign({}, data.user, { devices: data.device ? [data.device] : [] });
+    setFeUser(data.token, user);
+    return user;
+}
+
+async function feRegister(fullName, email, password) {
+    const res = await fetch(WORKER_URL + '/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.success) throw new Error(data.message || 'Kayıt başarısız.');
+    const user = Object.assign({}, data.user, { devices: data.device ? [data.device] : [] });
+    setFeUser(data.token, user);
+    return user;
+}
+
+/* === Bearer auth ile Ticket işlemleri === */
+function getFeAuthHeader() {
+    const token = getFeUser().token;
+    return token ? { Authorization: 'Bearer ' + token } : {};
+}
+
+async function fetchMyTickets() {
+    try {
+        const res = await fetch(WORKER_URL + '/api/support/tickets', {
+            headers: { ...getFeAuthHeader() }
+        });
         if (!res.ok) return [];
         const data = await res.json();
         return data.tickets || [];
     } catch (e) {
-        console.error('Fetch tickets error', e);
+        console.error('Fetch my tickets error', e);
         return [];
     }
 }
 
-async function createTicket(ticket) {
+async function createMyTicket(subject, message) {
+    const res = await fetch(WORKER_URL + '/api/support/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getFeAuthHeader() },
+        body: JSON.stringify({ subject, message })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.status) throw new Error(data.error || 'Talep oluşturulamadı.');
+    return data.id;
+}
+
+/* === Otomatik oturum geri yükleme === */
+async function restoreFeSession() {
+    const u = getFeUser();
+    if (!u.token) return false;
     try {
-        const res = await fetch(WORKER_URL + '/api/support/tickets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ticket)
+        const res = await fetch(WORKER_URL + '/me', {
+            headers: { Authorization: 'Bearer ' + u.token }
         });
-        if (!res.ok) throw new Error('Ticket oluşturulamadı');
-        return await res.json();
+        if (!res.ok) { clearFeUser(); return false; }
+        const data = await res.json();
+        setFeUser(u.token, data.user);
+        return true;
     } catch (e) {
-        throw e;
+        clearFeUser();
+        return false;
     }
 }
 
+/* === Admin ticket işlemleri (Basic auth) === */
 async function replyTicket(id, replyText) {
     try {
         const res = await fetch(WORKER_URL + '/api/support/tickets/' + id, {
@@ -454,38 +590,19 @@ function showToast(message, type) {
     toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 4000);
 }
 
-/* === Ticket form (index.html) === */
-const ticketForm = document.getElementById('ticketForm');
-if (ticketForm) {
-    ticketForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const btn = ticketForm.querySelector('button[type="submit"]');
-        const orig = btn.textContent;
-        btn.textContent = t('sendTicket') + '...';
-        btn.disabled = true;
-        try {
-            const name = document.getElementById('ticketName').value.trim();
-            const email = document.getElementById('ticketEmail').value.trim();
-            const subject = document.getElementById('ticketSubject').value.trim();
-            const message = document.getElementById('ticketMessage').value.trim();
-            if (!name || !email || !subject || !message) {
-                showToast(t('ticketError'), 'error');
-                return;
-            }
-            await createTicket({ name: escapeHtml(name), email: escapeHtml(email), subject: escapeHtml(subject), message: escapeHtml(message) });
-            ticketForm.reset();
-            renderTicketList();
-            showToast(t('ticketSuccess'));
-        } catch (e) {
-            showToast(t('ticketError'), 'error');
-        } finally {
-            btn.textContent = orig;
-            btn.disabled = false;
-        }
-    });
+/* === Ticket listesi (admin.html) === */
+async function fetchTickets() {
+    try {
+        const res = await fetch(WORKER_URL + '/api/support/tickets');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.tickets || [];
+    } catch (e) {
+        console.error('Fetch tickets error', e);
+        return [];
+    }
 }
 
-/* === Ticket listesi (index.html & admin.html) === */
 async function renderTicketList() {
     const list = document.getElementById('ticketList');
     if (!list) return;
@@ -580,85 +697,243 @@ if (adminTicketList) {
 }
 
 /* === Başlangıç === */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     applyTheme();
     applyLang();
-    renderTicketList();
+
+    // FireEye oturumu varsa geri yükle
+    await restoreFeSession();
 
     // Topbar butonları
     const loginBtn = document.getElementById('navLoginBtn');
     const registerBtn = document.getElementById('navRegisterBtn');
     const logoutBtn = document.getElementById('navLogoutBtn');
+    const userChip = document.getElementById('navUserChip');
+    const userName = document.getElementById('navUserName');
+    const lockedLoginBtn = document.getElementById('lockedLoginBtn');
+    const lockedRegisterBtn = document.getElementById('lockedRegisterBtn');
 
-    function updateAuthButtons() {
-        const loggedIn = isAdminLoggedIn();
-        if (loginBtn) loginBtn.style.display = loggedIn ? 'none' : 'inline-block';
-        if (registerBtn) registerBtn.style.display = loggedIn ? 'none' : 'inline-block';
-        if (logoutBtn) logoutBtn.style.display = loggedIn ? 'inline-block' : 'none';
-    }
-    updateAuthButtons();
+    function updateAuthUI() {
+        const feLoggedIn = isFeLoggedIn();
+        const adminLoggedIn = isAdminLoggedIn();
+        const anyLoggedIn = feLoggedIn || adminLoggedIn;
 
-    // Login modal (dinamik oluştur)
-    function openLoginModal() {
-        let modal = document.getElementById('loginModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'loginModal';
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-900/5">
-                    <div class="mb-5 flex items-center gap-3">
-                        <div class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900" data-i18n="adminLogin">Admin Girişi</h3>
-                            <p class="text-xs text-slate-400" data-i18n="adminLoginSub">Yetkili erişimi</p>
-                        </div>
-                    </div>
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="adminUser">Kullanıcı Adı</label>
-                    <input type="text" id="loginUser" autocomplete="username" required
-                        class="mb-4 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10">
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500" data-i18n="adminPass">Şifre</label>
-                    <input type="password" id="loginPass" autocomplete="current-password" required
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10">
-                    <div class="mt-5 flex justify-end gap-2">
-                        <button id="loginCancel" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" data-i18n="close">Kapat</button>
-                        <button id="loginSubmit" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700" data-i18n="adminLoginBtn">Giriş Yap</button>
-                    </div>
-                </div>`;
-            document.body.appendChild(modal);
-            applyLang();
-        }
-        modal.classList.add('open');
-        document.getElementById('loginSubmit')?.addEventListener('click', async () => {
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-            if (!user || !pass) { showToast('Kullanıcı adı ve şifre girin.', 'error'); return; }
-            const ok = await adminLogin(user, pass);
-            if (ok) {
-                modal.classList.remove('open');
-                updateAuthButtons();
-                showToast('Giriş başarılı.');
-                if (typeof renderAdmin === 'function') renderAdmin();
+        // Üst nav
+        if (loginBtn) loginBtn.style.display = anyLoggedIn ? 'none' : 'inline-block';
+        if (registerBtn) registerBtn.style.display = anyLoggedIn ? 'none' : 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = anyLoggedIn ? 'inline-block' : 'none';
+        if (userChip) {
+            if (feLoggedIn) {
+                userChip.classList.remove('hidden');
+                const u = getFeUser().user || {};
+                if (userName) userName.textContent = u.fullName || u.email || 'Kullanıcı';
             } else {
-                showToast('Kullanıcı adı veya şifre hatalı.', 'error');
+                userChip.classList.add('hidden');
+            }
+        }
+
+        // Ticket alanı: kilitli mi çalışma alanı mı?
+        const locked = document.getElementById('ticketLocked');
+        const workspace = document.getElementById('ticketWorkspace');
+        if (locked && workspace) {
+            if (feLoggedIn) {
+                locked.classList.add('hidden');
+                workspace.classList.remove('hidden');
+                renderMyTickets();
+            } else {
+                locked.classList.remove('hidden');
+                workspace.classList.add('hidden');
+            }
+        }
+    }
+    updateAuthUI();
+
+    /* === Auth modalı (var olan #authModal'ı kullanır) === */
+    const authModal = document.getElementById('authModal');
+    const loginForm = document.getElementById('tsLoginForm');
+    const registerForm = document.getElementById('tsRegisterForm');
+    const twoFaForm = document.getElementById('ts2faForm');
+    const authTitle = document.getElementById('authTitle');
+    const authSub = document.getElementById('authSub');
+    let twoFaChallenge = null;
+
+    function showAuthModal() {
+        if (authModal) authModal.classList.add('open');
+        showLoginStep();
+    }
+
+    function showLoginStep() {
+        if (loginForm) loginForm.classList.remove('hidden');
+        if (registerForm) registerForm.classList.add('hidden');
+        if (twoFaForm) twoFaForm.classList.add('hidden');
+        if (authTitle) authTitle.textContent = t('authTitleLogin');
+        if (authSub) authSub.textContent = t('authSubLogin');
+        document.getElementById('tsLoginError')?.classList.add('hidden');
+        document.getElementById('ts2faError')?.classList.add('hidden');
+    }
+
+    function showRegisterStep() {
+        if (loginForm) loginForm.classList.add('hidden');
+        if (registerForm) registerForm.classList.remove('hidden');
+        if (twoFaForm) twoFaForm.classList.add('hidden');
+        if (authTitle) authTitle.textContent = t('authTitleRegister');
+        if (authSub) authSub.textContent = t('authSubRegister');
+    }
+
+    function showTwoFaStep() {
+        if (loginForm) loginForm.classList.add('hidden');
+        if (registerForm) registerForm.classList.add('hidden');
+        if (twoFaForm) twoFaForm.classList.remove('hidden');
+        const hint = document.getElementById('ts2faHint');
+        if (hint) hint.textContent = t('twoFactorHint');
+        document.getElementById('ts2faError')?.classList.add('hidden');
+    }
+
+    if (authModal) {
+        document.getElementById('authCloseBtn')?.addEventListener('click', () => {
+            authModal.classList.remove('open');
+        });
+        // Modal dışına tıklanca kapanır
+        authModal.addEventListener('click', e => {
+            if (e.target === authModal) authModal.classList.remove('open');
+        });
+    }
+
+    // Giriş formu
+    loginForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsLoginError');
+        err.classList.add('hidden');
+        const email = document.getElementById('tsLoginEmail').value.trim();
+        const pass = document.getElementById('tsLoginPass').value;
+        if (!email || !pass) { err.textContent = 'E-posta ve şifre girin.'; err.classList.remove('hidden'); return; }
+        try {
+            const result = await feLogin(email, pass);
+            if (result.requires2fa) {
+                twoFaChallenge = result.challenge;
+                showTwoFaStep();
+            } else {
+                authModal.classList.remove('open');
+                updateAuthUI();
+                showToast('Giriş başarılı.');
+            }
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Giriş başarısız.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // 2FA doğrulama
+    twoFaForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('ts2faError');
+        err.classList.add('hidden');
+        const code = document.getElementById('ts2faCode').value.trim();
+        if (!code) { err.textContent = '6 haneli kodu girin.'; err.classList.remove('hidden'); return; }
+        try {
+            await feLogin2fa(twoFaChallenge, code);
+            twoFaChallenge = null;
+            authModal.classList.remove('open');
+            updateAuthUI();
+            showToast('Doğrulama başarılı, giriş yapıldı.');
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Kod doğrulanamadı.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // Kayıt formu
+    registerForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsRegisterError');
+        err.classList.add('hidden');
+        const name = document.getElementById('tsRegisterName').value.trim();
+        const email = document.getElementById('tsRegisterEmail').value.trim();
+        const pass = document.getElementById('tsRegisterPass').value;
+        if (!name || !email || !pass) { err.textContent = 'Tüm alanları doldurun.'; err.classList.remove('hidden'); return; }
+        try {
+            await feRegister(name, email, pass);
+            authModal.classList.remove('open');
+            updateAuthUI();
+            showToast('Hesap oluşturuldu ve giriş yapıldı.');
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Kayıt başarısız.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // Nav butonları
+    if (loginBtn) loginBtn.addEventListener('click', showAuthModal);
+    if (registerBtn) registerBtn.addEventListener('click', () => { showAuthModal(); showRegisterStep(); });
+    if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        clearFeUser();
+        adminLogout();
+        updateAuthUI();
+        showToast(t('logoutOk'));
+    });
+    if (lockedLoginBtn) lockedLoginBtn.addEventListener('click', showAuthModal);
+    if (lockedRegisterBtn) lockedRegisterBtn.addEventListener('click', () => { showAuthModal(); showRegisterStep(); });
+
+    /* === Ticket işlemleri === */
+    async function renderMyTickets() {
+        const list = document.getElementById('ticketList');
+        if (!list) return;
+        const u = getFeUser().user || {};
+        const nameEl = document.getElementById('ticketIdentityName');
+        const emailEl = document.getElementById('ticketIdentityEmail');
+        if (nameEl) nameEl.textContent = u.fullName || u.email || '—';
+        if (emailEl) emailEl.textContent = u.email || '';
+
+        const tickets = await fetchMyTickets();
+        tickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        list.innerHTML = '';
+        if (tickets.length === 0) {
+            list.innerHTML = '<div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-8 text-center text-xs text-slate-400">' + t('noTickets') + '</div>';
+            return;
+        }
+        tickets.forEach(tick => {
+            const open = tick.status === 'open';
+            const div = document.createElement('div');
+            div.className = 'rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 transition hover:border-brand-200 hover:bg-white';
+            div.innerHTML =
+                '<div class="flex items-start justify-between gap-2">' +
+                    '<strong class="text-sm font-semibold text-slate-800">' + escapeHtml(tick.subject) + '</strong>' +
+                    '<span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ' +
+                        (open ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700') + '">' +
+                        (open ? t('ticketStatusOpen') : t('ticketStatusClosed')) +
+                    '</span>' +
+                '</div>' +
+                '<p class="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500">' + escapeHtml(tick.message) + '</p>' +
+                '<p class="mt-2 text-[10px] font-medium text-slate-400">' + formatDate(tick.createdAt) + '</p>';
+            list.appendChild(div);
+        });
+    }
+
+    const ticketForm = document.getElementById('ticketForm');
+    if (ticketForm) {
+        ticketForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!isFeLoggedIn()) { showAuthModal(); return; }
+            const btn = ticketForm.querySelector('button[type="submit"]');
+            const orig = btn.textContent;
+            btn.textContent = t('sendTicket') + '...';
+            btn.disabled = true;
+            try {
+                const subject = document.getElementById('ticketSubject').value.trim();
+                const message = document.getElementById('ticketMessage').value.trim();
+                if (!subject || !message) { showToast('Konu ve mesaj girin.', 'error'); return; }
+                await createMyTicket(subject, message);
+                ticketForm.reset();
+                renderMyTickets();
+                showToast(t('ticketSuccess'));
+            } catch (err) {
+                showToast(t('ticketError'), 'error');
+            } finally {
+                btn.textContent = orig;
+                btn.disabled = false;
             }
         });
-        document.getElementById('loginCancel')?.addEventListener('click', () => {
-            modal.classList.remove('open');
-        });
     }
-
-    if (loginBtn) loginBtn.addEventListener('click', openLoginModal);
-    if (registerBtn) registerBtn.addEventListener('click', () => {
-        showToast('Yeni kayıt şu anda devre dışı. Destek formundan talep açabilirsiniz.', 'error');
-    });
-    if (logoutBtn) logoutBtn.addEventListener('click', () => {
-        adminLogout();
-        updateAuthButtons();
-        if (typeof renderAdmin === 'function') renderAdmin();
-    });
 
     // Dil değiştirme
     const langBtn = document.getElementById('langToggle');
@@ -667,7 +942,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lang = lang === 'tr' ? 'en' : 'tr';
             localStorage['ts-lang'] = lang;
             applyLang();
-            renderTicketList();
+            updateAuthUI();
+            renderMyTickets();
         });
     }
 
@@ -685,7 +961,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aiChatInput) aiChatInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleAIChatSend(); });
     if (aiSettingsBtn2) {
         aiSettingsBtn2.addEventListener('click', () => {
-            alert('AI ayarları sunucu tarafında yönetilir.');
+            showToast('AI ayarları sunucu tarafında yönetilir.');
         });
     }
 
