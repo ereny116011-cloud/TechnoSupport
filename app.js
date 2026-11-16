@@ -65,9 +65,23 @@ const FE_I18N = {
         passwordLabel: 'Şifre',
         fullNameLabel: 'Ad Soyad',
         passwordHint: 'En az 6 karakter.',
+        currentPasswordLabel: 'Mevcut Şifre',
+        newPasswordLabel: 'Yeni Şifre',
+        newPasswordOptional: 'Boş bırakılırsa şifre değişmez.',
         twoFactorCode: 'Doğrulama kodu',
         twoFactorHint: 'E-postanıza 6 haneli kod gönderdik.',
         verifyBtn: 'Doğrula',
+        resetTokenLabel: 'Sıfırlama Token\'ı',
+        verifyTokenLabel: 'Doğrulama Token\'ı',
+        forgotHint: 'Kayıtlı e-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim.',
+        resetHint: 'E-postanıza gelen sıfırlama token\'ını ve yeni şifrenizi girin.',
+        verifyHint: 'E-postanıza gelen doğrulama token\'ını girin.',
+        forgotSubmit: 'Sıfırlama Bağlantısı Gönder',
+        resetSubmit: 'Şifreyi Sıfırla',
+        verifySubmit: 'E-postayı Doğrula',
+        verifyResend: 'Doğrulama kodunu yeniden gönder',
+        backToLogin: 'Giriş sayfasına dön',
+        backToProfile: 'Profili görüntüle',
         back: 'Geri dön',
         registerSubmit: 'Hesap Oluştur',
         loginSubmit: 'Giriş Yap',
@@ -75,10 +89,20 @@ const FE_I18N = {
         loginLink: 'Giriş yap',
         noAccount: 'Hesabınız yok mu?',
         registerLink: 'Kaydol',
+        forgotLink: 'Şifremi unuttum',
+        orSeparator: 'Veya ile devam edin',
+        googleLogin: 'Google ile Giriş',
+        microsoftLogin: 'Microsoft ile Giriş',
+        githubLogin: 'GitHub ile Giriş',
         authTitleLogin: 'FireEye hesabınızla giriş yapın',
         authSubLogin: 'Destek talebi açmak için giriş yapın.',
         authTitleRegister: 'Yeni hesap oluşturun',
         authSubRegister: 'TechnoSupport\'ta destek talebi açmak için bir hesap oluşturun.',
+        tabLogin: 'Giriş Yap',
+        tabRegister: 'Kaydol',
+        tabForgot: 'Şifremi Unuttum',
+        tabReset: 'Şifre Sıfırla',
+        tabVerify: 'Email Doğrula',
         authRequiredTitle: 'Taleplerinizi görmek için giriş yapın',
         authRequiredText: 'E-posta desteği ve AI asistan giriş olmadan çalışır. Destek talebi açmak ve taleplerinizi takip etmek için FireEye hesabınızla giriş yapın.',
         authRequiredBtn: 'FireEye ile giriş yap',
@@ -86,6 +110,20 @@ const FE_I18N = {
         listTitleMine: 'Taleplerim',
         meFail: 'Oturum bilgisi alınamadı.',
         logoutOk: 'Başarıyla çıkış yapıldı.',
+        profileTitle: 'Hesap Profili',
+        profileEdit: 'Bilgileri Düzenle',
+        profileEditSubmit: 'Değişiklikleri Kaydet',
+        profileEmail: 'E-posta',
+        profileFullName: 'Ad Soyad',
+        twofaTitle: 'İki Adımlı Doğrulama',
+        twofaDesc: 'Girişte e-posta size 6 hanelik kod gönderir.',
+        twofaStatusChecking: 'Kontrol ediliyor...',
+        twofaStatusOn: 'Açık',
+        twofaStatusOff: 'Kapalı',
+        twofaBtnSetup: '2FA\'yı Kur',
+        twofaBtnEnable: '2FA\'yı Etkinleştir',
+        twofaBtnDisable: '2FA\'yı Devre Dışı Bırak',
+        twofaEnterCode: '6 haneli kodu girin',
         adminPass: 'Şifre',
         adminLoginBtn: 'Giriş Yap',
         adminLogout: 'Çıkış',
@@ -170,9 +208,23 @@ const FE_I18N = {
         passwordLabel: 'Password',
         fullNameLabel: 'Full name',
         passwordHint: 'At least 6 characters.',
+        currentPasswordLabel: 'Current Password',
+        newPasswordLabel: 'New Password',
+        newPasswordOptional: 'Leave blank to keep current password.',
         twoFactorCode: 'Verification code',
         twoFactorHint: 'We sent a 6-digit code to your email.',
         verifyBtn: 'Verify',
+        resetTokenLabel: 'Reset Token',
+        verifyTokenLabel: 'Verification Token',
+        forgotHint: 'Enter your registered email address and we will send a password reset link.',
+        resetHint: 'Enter the reset token from your email and your new password.',
+        verifyHint: 'Enter the verification token from your email.',
+        forgotSubmit: 'Send Reset Link',
+        resetSubmit: 'Reset Password',
+        verifySubmit: 'Verify Email',
+        verifyResend: 'Resend verification code',
+        backToLogin: 'Return to login',
+        backToProfile: 'View Profile',
         back: 'Back',
         registerSubmit: 'Create Account',
         loginSubmit: 'Login',
@@ -180,10 +232,20 @@ const FE_I18N = {
         loginLink: 'Log in',
         noAccount: "Don't have an account?",
         registerLink: 'Register',
+        forgotLink: 'Forgot password',
+        orSeparator: 'Or continue with',
+        googleLogin: 'Sign in with Google',
+        microsoftLogin: 'Sign in with Microsoft',
+        githubLogin: 'Sign in with GitHub',
         authTitleLogin: 'Sign in with your FireEye account',
         authSubLogin: 'Sign in to open a support ticket.',
         authTitleRegister: 'Create new account',
         authSubRegister: 'Create an account to open support tickets on TechnoSupport.',
+        tabLogin: 'Login',
+        tabRegister: 'Register',
+        tabForgot: 'Forgot Password',
+        tabReset: 'Reset Password',
+        tabVerify: 'Verify Email',
         authRequiredTitle: 'Sign in to view your tickets',
         authRequiredText: 'Email support and AI assistant work without signing in. To open a support ticket and track your tickets, sign in with your FireEye account.',
         authRequiredBtn: 'Sign in with FireEye',
@@ -191,6 +253,20 @@ const FE_I18N = {
         listTitleMine: 'My tickets',
         meFail: 'Failed to load session.',
         logoutOk: 'Signed out successfully.',
+        profileTitle: 'Account Profile',
+        profileEdit: 'Edit Details',
+        profileEditSubmit: 'Save Changes',
+        profileEmail: 'Email',
+        profileFullName: 'Full Name',
+        twofaTitle: 'Two-Factor Authentication',
+        twofaDesc: 'Login sends a 6-digit code to your email.',
+        twofaStatusChecking: 'Checking...',
+        twofaStatusOn: 'Enabled',
+        twofaStatusOff: 'Disabled',
+        twofaBtnSetup: 'Set up 2FA',
+        twofaBtnEnable: 'Enable 2FA',
+        twofaBtnDisable: 'Disable 2FA',
+        twofaEnterCode: 'Enter the 6-digit code',
         adminPass: 'Password',
         adminLoginBtn: 'Login',
         adminLogout: 'Logout',
@@ -218,6 +294,14 @@ const FE_I18N = {
 let lang = localStorage['ts-lang'] || 'tr';
 let theme = localStorage['ts-theme'] || 'light';
 let WORKER_URL = 'https://fireeye-api.ereny116011.workers.dev';
+
+// OAuth sağlayıcı kimlikleri (Google Cloud Console / Azure Portal / GitHub Settings)
+// Boş bırakılan sağlayıcının butonu otomatik gizlenir.
+const OAUTH_CLIENTS = {
+    google: 'YOUR_GOOGLE_CLIENT_ID',
+    microsoft: 'YOUR_MICROSOFT_CLIENT_ID',
+    github: 'YOUR_GITHUB_CLIENT_ID'
+};
 
 // AI asistanına TechnoWeb / FireEye bilgi tabanı (Worker tarafına system prompt olarak gönderilir).
 const SUPPORT_SYSTEM_PROMPT = `Sen TechnoWeb'in (https://www.technoweb.win) resmi destek asistanısın. Adın "TechnoSupport AI".
@@ -385,6 +469,118 @@ async function feRegister(fullName, email, password) {
     const user = Object.assign({}, data.user, { devices: data.device ? [data.device] : [] });
     setFeUser(data.token, user);
     return user;
+}
+
+/* === Şifre Sıfırlama === */
+async function feForgotPassword(email) {
+    const res = await fetch(WORKER_URL + '/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'Sıfırlama bağlantısı gönderilemedi.');
+    return data;
+}
+
+async function feResetPassword(token, newPassword) {
+    const res = await fetch(WORKER_URL + '/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password: newPassword })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'Şifre sıfırlanamadı.');
+    return data;
+}
+
+/* === Email Doğrulama === */
+async function feVerifyEmail(email, token) {
+    const res = await fetch(WORKER_URL + '/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'E-posta doğrulanamadı.');
+    return data;
+}
+
+async function feResendVerification(email) {
+    const res = await fetch(WORKER_URL + '/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'Doğrulama kodu gönderilemedi.');
+    return data;
+}
+
+/* === 2FA Yönetimi (Bearer auth gerekli) === */
+async function feGet2faStatus() {
+    const res = await fetch(WORKER_URL + '/2fa/status', {
+        headers: { ...getFeAuthHeader() }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || '2FA durumu alınamadı.');
+    return data;
+}
+
+async function feSetup2fa() {
+    const res = await fetch(WORKER_URL + '/2fa/setup', {
+        method: 'POST',
+        headers: { ...getFeAuthHeader() }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || '2FA kurulumu başarısız.');
+    return data;
+}
+
+async function feEnable2fa(code) {
+    const res = await fetch(WORKER_URL + '/2fa/enable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getFeAuthHeader() },
+        body: JSON.stringify({ code })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || '2FA etkinleştirilemedi.');
+    return data;
+}
+
+async function feDisable2fa() {
+    const res = await fetch(WORKER_URL + '/2fa/disable', {
+        method: 'POST',
+        headers: { ...getFeAuthHeader() }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || '2FA devre dışı bırakılamadı.');
+    return data;
+}
+
+/* === Profil / Hesap Ayarları (Bearer auth gerekli) === */
+async function feGetProfile() {
+    const res = await fetch(WORKER_URL + '/me', {
+        headers: { ...getFeAuthHeader() }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'Profil alınamadı.');
+    return data.user;
+}
+
+async function feUpdateCredentials(fullName, currentPassword, newPassword) {
+    const body = {};
+    if (fullName) body.fullName = fullName;
+    if (currentPassword) body.currentPassword = currentPassword;
+    if (newPassword) body.newPassword = newPassword;
+    const res = await fetch(WORKER_URL + '/user/update-credentials', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getFeAuthHeader() },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) throw new Error(data.message || 'Güncelleme başarısız.');
+    return data;
 }
 
 /* === Bearer auth ile Ticket işlemleri === */
@@ -748,82 +944,320 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     updateAuthUI();
 
-    /* === Auth modalı (var olan #authModal'ı kullanır) === */
+    /* === Auth modalı (tüm FireEye auth sistemleri) === */
     const authModal = document.getElementById('authModal');
+
+    // Sekme butonları
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const tabForgot = document.getElementById('tabForgot');
+    const tabReset = document.getElementById('tabReset');
+    const tabVerify = document.getElementById('tabVerify');
+
+    // Formlar
     const loginForm = document.getElementById('tsLoginForm');
     const registerForm = document.getElementById('tsRegisterForm');
     const twoFaForm = document.getElementById('ts2faForm');
+    const forgotForm = document.getElementById('tsForgotForm');
+    const resetForm = document.getElementById('tsResetForm');
+    const verifyForm = document.getElementById('tsVerifyForm');
+    const profileEditForm = document.getElementById('tsProfileEditForm');
+
+    // Adımlar (div/form)
+    const steps = document.querySelectorAll('.auth-step');
     const authTitle = document.getElementById('authTitle');
     const authSub = document.getElementById('authSub');
     let twoFaChallenge = null;
+
+    function hideAllSteps() {
+        steps.forEach(s => s.classList.remove('active'));
+        [tabLogin, tabRegister, tabForgot, tabReset, tabVerify].forEach(t => {
+            if (t) {
+                t.classList.remove('active');
+                t.classList.remove('border-b-2', 'border-brand-600', 'text-brand-600');
+                t.classList.add('text-slate-500');
+            }
+        });
+    }
+
+    function activateTab(btn) {
+        [tabLogin, tabRegister, tabForgot, tabReset, tabVerify].forEach(t => {
+            if (t) {
+                t.classList.remove('active');
+                t.classList.remove('border-b-2', 'border-brand-600', 'text-brand-600');
+                t.classList.add('text-slate-500');
+            }
+        });
+        if (btn) {
+            btn.classList.add('active');
+            btn.classList.remove('text-slate-500');
+            btn.classList.add('text-brand-600', 'border-b-2', 'border-brand-600');
+        }
+    }
+
+    function showLoginStep() {
+        hideAllSteps();
+        if (loginForm) loginForm.classList.add('active');
+        if (authTitle) authTitle.textContent = t('authTitleLogin');
+        if (authSub) authSub.textContent = t('authSubLogin');
+        activateTab(tabLogin);
+        clearAuthErrors();
+    }
+
+    function showRegisterStep() {
+        hideAllSteps();
+        if (registerForm) registerForm.classList.add('active');
+        if (authTitle) authTitle.textContent = t('authTitleRegister');
+        if (authSub) authSub.textContent = t('authSubRegister');
+        activateTab(tabRegister);
+        clearAuthErrors();
+    }
+
+    function showForgotStep() {
+        hideAllSteps();
+        if (forgotForm) forgotForm.classList.add('active');
+        if (authTitle) authTitle.textContent = t('tabForgot');
+        if (authSub) authSub.textContent = t('forgotHint');
+        activateTab(tabForgot);
+        clearAuthErrors();
+    }
+
+    function showResetStep() {
+        hideAllSteps();
+        if (resetForm) resetForm.classList.add('active');
+        if (authTitle) authTitle.textContent = t('tabReset');
+        if (authSub) authSub.textContent = t('resetHint');
+        activateTab(tabReset);
+        clearAuthErrors();
+    }
+
+    function showVerifyStep() {
+        hideAllSteps();
+        if (verifyForm) verifyForm.classList.add('active');
+        if (authTitle) authTitle.textContent = t('tabVerify');
+        if (authSub) authSub.textContent = t('verifyHint');
+        activateTab(tabVerify);
+        clearAuthErrors();
+    }
+
+    function show2faSettingsStep() {
+        hideAllSteps();
+        const el = document.getElementById('ts2faSettings');
+        if (el) el.classList.add('active');
+        if (authTitle) authTitle.textContent = t('twofaTitle');
+        if (authSub) authSub.textContent = t('twofaDesc');
+        load2faSettings();
+        clearAuthErrors();
+    }
+
+    function showProfileStep() {
+        hideAllSteps();
+        const el = document.getElementById('tsProfile');
+        if (el) el.classList.add('active');
+        if (authTitle) authTitle.textContent = t('profileTitle');
+        if (authSub) authSub.textContent = '';
+        loadProfile();
+        clearAuthErrors();
+    }
+
+    function showProfileEditStep() {
+        hideAllSteps();
+        const el = document.getElementById('tsProfileEditForm');
+        if (el) el.classList.add('active');
+        if (authTitle) authTitle.textContent = t('profileEdit');
+        if (authSub) authSub.textContent = '';
+        loadProfileEditFields();
+        clearAuthErrors();
+    }
+
+    function clearAuthErrors() {
+        ['tsLoginError','ts2faError','tsRegisterError','tsForgotError','tsResetError','tsVerifyError','ts2faSettingsError','ts2faSettingsSuccess','tsProfileError','tsProfileSuccess','tsProfileEditError'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+    }
+
+    function showAuthError(id, msg) {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+    function showAuthSuccess(id, msg) {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+    function showAuthSuccess(id, msg) {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
 
     function showAuthModal() {
         if (authModal) authModal.classList.add('open');
         showLoginStep();
     }
 
-    function showLoginStep() {
-        if (loginForm) loginForm.classList.remove('hidden');
-        if (registerForm) registerForm.classList.add('hidden');
-        if (twoFaForm) twoFaForm.classList.add('hidden');
-        if (authTitle) authTitle.textContent = t('authTitleLogin');
-        if (authSub) authSub.textContent = t('authSubLogin');
-        document.getElementById('tsLoginError')?.classList.add('hidden');
-        document.getElementById('ts2faError')?.classList.add('hidden');
-    }
-
-    function showRegisterStep() {
-        if (loginForm) loginForm.classList.add('hidden');
-        if (registerForm) registerForm.classList.remove('hidden');
-        if (twoFaForm) twoFaForm.classList.add('hidden');
-        if (authTitle) authTitle.textContent = t('authTitleRegister');
-        if (authSub) authSub.textContent = t('authSubRegister');
-    }
-
-    function showTwoFaStep() {
-        if (loginForm) loginForm.classList.add('hidden');
-        if (registerForm) registerForm.classList.add('hidden');
-        if (twoFaForm) twoFaForm.classList.remove('hidden');
-        const hint = document.getElementById('ts2faHint');
-        if (hint) hint.textContent = t('twoFactorHint');
-        document.getElementById('ts2faError')?.classList.add('hidden');
-    }
-
     if (authModal) {
         document.getElementById('authCloseBtn')?.addEventListener('click', () => {
             authModal.classList.remove('open');
         });
-        // Modal dışına tıklanca kapanır
         authModal.addEventListener('click', e => {
             if (e.target === authModal) authModal.classList.remove('open');
         });
     }
 
-    // Giriş formu
-    loginForm?.addEventListener('submit', async e => {
-        e.preventDefault();
-        const err = document.getElementById('tsLoginError');
-        err.classList.add('hidden');
-        const email = document.getElementById('tsLoginEmail').value.trim();
-        const pass = document.getElementById('tsLoginPass').value;
-        if (!email || !pass) { err.textContent = 'E-posta ve şifre girin.'; err.classList.remove('hidden'); return; }
+    // Sekme geçişleri
+    tabLogin?.addEventListener('click', showLoginStep);
+    tabRegister?.addEventListener('click', showRegisterStep);
+    tabForgot?.addEventListener('click', showForgotStep);
+    tabReset?.addEventListener('click', showResetStep);
+    tabVerify?.addEventListener('click', showVerifyStep);
+
+    // === OAuth butonları (Google, Microsoft, GitHub) ===
+
+    // Google Sign-In callback
+    window.handleGoogleCredential = async (idToken) => {
         try {
-            const result = await feLogin(email, pass);
-            if (result.requires2fa) {
-                twoFaChallenge = result.challenge;
-                showTwoFaStep();
-            } else {
+            const res = await fetch(WORKER_URL + '/api/support/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: idToken })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setFeUser(data.token, data.user);
                 authModal.classList.remove('open');
                 updateAuthUI();
-                showToast('Giriş başarılı.');
+                showToast('Google ile giriş başarılı.');
+            } else {
+                showToast(data.message || 'Google girişi başarısız.');
             }
-        } catch (errObj) {
-            err.textContent = String(errObj && errObj.message) || 'Giriş başarısız.';
-            err.classList.remove('hidden');
+        } catch (e) {
+            showToast('Google girişi sırasında hata oluştu.');
+        }
+    };
+
+    // Microsoft OAuth popup
+    async function openOAuthPopup(provider, authUrl) {
+        const width = 500;
+        const height = 600;
+        const left = (window.screen.width - width) / 2;
+        const top = (window.screen.height - height) / 2;
+        const popup = window.open(authUrl, 'oauth_popup', `width=${width},height=${height},left=${left},top=${top}`);
+
+        const pollInterval = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(pollInterval);
+                return;
+            }
+            try {
+                const popupUrl = popup.location.href;
+                if (popupUrl.includes(window.location.origin + '/oauth/callback')) {
+                    clearInterval(pollInterval);
+                    popup.close();
+                    const urlParams = new URLSearchParams(new URL(popupUrl).search);
+                    const code = urlParams.get('code');
+                    const providerName = urlParams.get('provider') || provider;
+                    const error = urlParams.get('error');
+                    if (error) {
+                        showToast('OAuth hatası: ' + decodeURIComponent(error));
+                        return;
+                    }
+                    if (code) {
+                        handleOAuthCallback(providerName, code);
+                    }
+                }
+            } catch (e) {
+                // Cross-origin access blocked
+            }
+        }, 500);
+
+        setTimeout(() => {
+            clearInterval(pollInterval);
+            if (!popup.closed) popup.close();
+        }, 300000);
+    }
+
+    async function handleOAuthCallback(provider, code) {
+        try {
+            const res = await fetch(WORKER_URL + '/api/support/auth/' + provider, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setFeUser(data.token, data.user);
+                authModal.classList.remove('open');
+                updateAuthUI();
+                showToast(provider.charAt(0).toUpperCase() + provider.slice(1) + ' ile giriş başarılı.');
+            } else {
+                showToast(data.message || provider + ' girişi başarısız.');
+            }
+        } catch (e) {
+            showToast(provider + ' girişi sırasında hata oluştu.');
+        }
+    }
+
+    // Google ile giriş
+    document.getElementById('btnGoogleLogin')?.addEventListener('click', () => {
+        const googleClientId = OAUTH_CLIENTS.google;
+        if (!googleClientId || googleClientId.indexOf('YOUR_') === 0) {
+            showToast('Google girişi henüz yapılandırılmadı.');
+            return;
+        }
+        google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: window.handleGoogleCredential
+        });
+        google.accounts.id.prompt();
+    });
+
+    // Microsoft ile giriş
+    document.getElementById('btnMicrosoftLogin')?.addEventListener('click', () => {
+        const microsoftClientId = OAUTH_CLIENTS.microsoft;
+        if (!microsoftClientId || microsoftClientId.indexOf('YOUR_') === 0) {
+            showToast('Microsoft girişi henüz yapılandırılmadı.');
+            return;
+        }
+        const redirectUri = window.location.origin + '/oauth/callback?provider=microsoft';
+        const scope = 'openid email profile';
+        const authUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' +
+            'client_id=' + encodeURIComponent(microsoftClientId) +
+            '&redirect_uri=' + encodeURIComponent(redirectUri) +
+            '&response_type=code' +
+            '&scope=' + encodeURIComponent(scope) +
+            '&response_mode=query';
+        openOAuthPopup('microsoft', authUrl);
+    });
+
+    // GitHub ile giriş
+    document.getElementById('btnGitHubLogin')?.addEventListener('click', () => {
+        const githubClientId = OAUTH_CLIENTS.github;
+        if (!githubClientId || githubClientId.indexOf('YOUR_') === 0) {
+            showToast('GitHub girişi henüz yapılandırılmadı.');
+            return;
+        }
+        const redirectUri = window.location.origin + '/oauth/callback?provider=github';
+        const scope = 'user:email';
+        const authUrl = 'https://github.com/login/oauth/authorize?' +
+            'client_id=' + encodeURIComponent(githubClientId) +
+            '&redirect_uri=' + encodeURIComponent(redirectUri) +
+            '&scope=' + encodeURIComponent(scope);
+        openOAuthPopup('github', authUrl);
+    });
+
+    // Yapılandırılmamış OAuth butonlarını gizle
+    Object.keys(OAUTH_CLIENTS).forEach(provider => {
+        const id = OAUTH_CLIENTS[provider];
+        const btn = document.getElementById('btn' + provider.charAt(0).toUpperCase() + provider.slice(1) + 'Login');
+        if (btn && (!id || id.indexOf('YOUR_') === 0)) {
+            btn.classList.add('hidden');
+            btn.setAttribute('data-not-configured', '1');
         }
     });
 
-    // 2FA doğrulama
+    // === 2FA GİRİŞ DOĞRULAMA ===
+
+    // === 2FA GİRİŞ DOĞRULAMA ===
     twoFaForm?.addEventListener('submit', async e => {
         e.preventDefault();
         const err = document.getElementById('ts2faError');
@@ -842,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Kayıt formu
+    // === KAYIT ===
     registerForm?.addEventListener('submit', async e => {
         e.preventDefault();
         const err = document.getElementById('tsRegisterError');
@@ -862,6 +1296,194 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // === ŞİFREMI UNUTTUM ===
+    forgotForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsForgotError');
+        err.classList.add('hidden');
+        const email = document.getElementById('tsForgotEmail').value.trim();
+        if (!email) { err.textContent = 'E-posta girin.'; err.classList.remove('hidden'); return; }
+        try {
+            await feForgotPassword(email);
+            const errEl = document.getElementById('tsForgotError');
+            errEl.textContent = 'Şifre sıfırlama bağlantısı gönderildi. E-postanıza bakın.';
+            errEl.className = 'rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-600';
+            errEl.classList.remove('hidden');
+            forgotForm.reset();
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Gönderilemedi.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // === ŞİFRE SIFIRLA ===
+    resetForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsResetError');
+        err.classList.add('hidden');
+        const token = document.getElementById('tsResetToken').value.trim();
+        const pass = document.getElementById('tsResetPass').value;
+        if (!token || !pass) { err.textContent = 'Token ve yeni şifre girin.'; err.classList.remove('hidden'); return; }
+        try {
+            await feResetPassword(token, pass);
+            authModal.classList.remove('open');
+            updateAuthUI();
+            showToast('Şifre sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.');
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Şifre sıfırlanamadı.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // === EMAIL DOĞRULA ===
+    verifyForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsVerifyError');
+        err.classList.add('hidden');
+        const email = document.getElementById('tsVerifyEmail').value.trim();
+        const token = document.getElementById('tsVerifyToken').value.trim();
+        if (!email || !token) { err.textContent = 'E-posta ve token girin.'; err.classList.remove('hidden'); return; }
+        try {
+            await feVerifyEmail(email, token);
+            showToast('E-posta doğrulandı.');
+            authModal.classList.remove('open');
+            updateAuthUI();
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Doğrulanamadı.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    document.getElementById('verifyResendBtn')?.addEventListener('click', async () => {
+        const err = document.getElementById('tsVerifyError');
+        err.classList.add('hidden');
+        const email = document.getElementById('tsVerifyEmail').value.trim();
+        if (!email) { err.textContent = 'E-posta girin.'; err.classList.remove('hidden'); return; }
+        try {
+            await feResendVerification(email);
+            showToast('Doğrulama kodu yeniden gönderildi.');
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Gönderilemedi.';
+            err.classList.remove('hidden');
+        }
+    });
+
+    // === 2FA AYARLARI ===
+    async function load2faSettings() {
+        const err = document.getElementById('ts2faSettingsError');
+        const succ = document.getElementById('ts2faSettingsSuccess');
+        const statusBadge = document.getElementById('ts2faStatusBadge');
+        const actions = document.getElementById('ts2faSettingsActions');
+        const dot = statusBadge?.querySelector('span');
+        const label = statusBadge?.querySelector('span:last-child') || statusBadge;
+        err.classList.add('hidden'); succ.classList.add('hidden');
+        actions.innerHTML = '';
+        try {
+            const data = await feGet2faStatus();
+            const enabled = data.enabled !== false;
+            if (dot) dot.className = enabled ? 'h-1.5 w-1.5 rounded-full bg-emerald-500' : 'h-1.5 w-1.5 rounded-full bg-amber-400';
+            label.textContent = enabled ? t('twofaStatusOn') : t('twofaStatusOff');
+            if (enabled) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'w-full rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700';
+                btn.textContent = t('twofaBtnDisable');
+                btn.addEventListener('click', async () => {
+                    try {
+                        await feDisable2fa();
+                        showAuthSuccess('ts2faSettingsSuccess', '2FA devre dışı bırakıldı.');
+                        load2faSettings();
+                    } catch (e) { showAuthError('ts2faSettingsError', String(e && e.message) || 'İşlem başarısız.'); }
+                });
+                actions.appendChild(btn);
+            } else {
+                const btnSetup = document.createElement('button');
+                btnSetup.type = 'button';
+                btnSetup.className = 'w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700';
+                btnSetup.textContent = t('twofaBtnSetup');
+                btnSetup.addEventListener('click', async () => {
+                    try {
+                        await feSetup2fa();
+                        showAuthSuccess('ts2faSettingsSuccess', 'Doğrulama kodu e-postanıza gönderildi. Kodu girin.');
+                        const codeInput = document.createElement('input');
+                        codeInput.type = 'text'; codeInput.inputmode = 'numeric'; codeInput.maxlength = '6';
+                        codeInput.className = 'w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-center text-lg font-bold tracking-[0.4em] text-slate-800 outline-none transition focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10';
+                        codeInput.placeholder = '000000';
+                        actions.appendChild(codeInput);
+                        const btnEnable = document.createElement('button');
+                        btnEnable.type = 'button';
+                        btnEnable.className = 'w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 mt-2';
+                        btnEnable.textContent = t('twofaBtnEnable');
+                        btnEnable.addEventListener('click', async () => {
+                            const code = codeInput.value.trim();
+                            if (!code) { showAuthError('ts2faSettingsError', 'Kod girin.'); return; }
+                            try {
+                                await feEnable2fa(code);
+                                showAuthSuccess('ts2faSettingsSuccess', '2FA etkinleştirildi.');
+                                load2faSettings();
+                            } catch (e) { showAuthError('ts2faSettingsError', String(e && e.message) || 'Başarısız.'); }
+                        });
+                        actions.appendChild(btnEnable);
+                    } catch (e) { showAuthError('ts2faSettingsError', String(e && e.message) || 'Kurulum başarısız.'); }
+                });
+                actions.appendChild(btnSetup);
+            }
+        } catch (e) {
+            showAuthError('ts2faSettingsError', String(e && e.message) || '2FA durumu alınamadı.');
+        }
+    }
+
+    document.getElementById('twofaSettingsBackBtn')?.addEventListener('click', showProfileStep);
+
+    // === PROFİL ===
+    async function loadProfile() {
+        const err = document.getElementById('tsProfileError');
+        const emailEl = document.getElementById('tsProfileEmail');
+        const nameEl = document.getElementById('tsProfileFullName');
+        err.classList.add('hidden');
+        try {
+            const user = await feGetProfile();
+            if (emailEl) emailEl.textContent = user.email || '—';
+            if (nameEl) nameEl.textContent = user.fullName || '—';
+        } catch (e) {
+            err.textContent = String(e && e.message) || t('meFail');
+            err.classList.remove('hidden');
+        }
+    }
+
+    async function loadProfileEditFields() {
+        const nameEl = document.getElementById('tsEditFullName');
+        try {
+            const user = await feGetProfile();
+            if (nameEl) nameEl.value = user.fullName || '';
+        } catch (e) { /* ignore */ }
+    }
+
+    document.getElementById('profileEditBtn')?.addEventListener('click', showProfileEditStep);
+    document.getElementById('profileBackBtn')?.addEventListener('click', () => { showProfileStep(); loadProfile(); });
+    document.getElementById('profileEditBackBtn')?.addEventListener('click', showProfileStep);
+
+    profileEditForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const err = document.getElementById('tsProfileEditError');
+        const succ = document.getElementById('tsProfileSuccess');
+        err.classList.add('hidden'); succ.classList.add('hidden');
+        const fullName = document.getElementById('tsEditFullName').value.trim();
+        const curPass = document.getElementById('tsEditCurrentPass').value;
+        const newPass = document.getElementById('tsEditNewPass').value;
+        if (!fullName && !curPass && !newPass) { err.textContent = 'En az bir alan doldurun.'; err.classList.remove('hidden'); return; }
+        if ((curPass && !newPass) || (!curPass && newPass)) { err.textContent = 'Şifre değişimi için mevcut ve yeni şifre 둘 다 gerekli.'; err.classList.remove('hidden'); return; }
+        try {
+            await feUpdateCredentials(fullName || undefined, curPass || undefined, newPass || undefined);
+            showAuthSuccess('tsProfileSuccess', 'Profil güncellendi.');
+            loadProfile();
+            loadProfileEditFields();
+        } catch (errObj) {
+            err.textContent = String(errObj && errObj.message) || 'Güncellenemedi.';
+            err.classList.remove('hidden');
+        }
+    });
+
     // Nav butonları
     if (loginBtn) loginBtn.addEventListener('click', showAuthModal);
     if (registerBtn) registerBtn.addEventListener('click', () => { showAuthModal(); showRegisterStep(); });
@@ -873,6 +1495,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     if (lockedLoginBtn) lockedLoginBtn.addEventListener('click', showAuthModal);
     if (lockedRegisterBtn) lockedRegisterBtn.addEventListener('click', () => { showAuthModal(); showRegisterStep(); });
+    document.getElementById('showRegisterBtn')?.addEventListener('click', () => showRegisterStep());
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showLoginStep());
+    document.getElementById('showForgotBtn')?.addEventListener('click', () => showForgotStep());
+    document.getElementById('forgotBackBtn')?.addEventListener('click', () => showLoginStep());
+    document.getElementById('resetBackBtn')?.addEventListener('click', () => showLoginStep());
+    document.getElementById('verifyBackBtn')?.addEventListener('click', () => showLoginStep());
 
     /* === Ticket işlemleri === */
     async function renderMyTickets() {

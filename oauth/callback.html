@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAuth Callback - TechnoSupport</title>
+<style>
+    body { font-family: system-ui, sans-serif; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 { color: #1e293b; font-size: 1.25rem; margin-bottom: 0.5rem; }
+    p { color: #64748b; font-size: 0.9rem; margin-bottom: 1rem; }
+    .success { color: #16a34a; font-weight: 600; }
+    .error { color: #dc2626; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+    <div class="spinner"></div>
+    <h1 id="statusTitle">OAuth doğrulanıyor...</h1>
+    <p id="statusMessage">Lütfen bekleyiniz, yönlendiriliyorsunuz...</p>
+</div>
+
+<script>
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const provider = params.get('provider') || 'google';
+    const error = params.get('error');
+    const errorDescription = params.get('error_description');
+
+    const statusTitle = document.getElementById('statusTitle');
+    const statusMessage = document.getElementById('statusMessage');
+
+    if (error) {
+        statusTitle.textContent = 'Hata';
+        statusTitle.className = 'error';
+        statusMessage.textContent = errorDescription || error;
+        return;
+    }
+
+    if (!code) {
+        statusTitle.textContent = 'Geçersiz istek';
+        statusTitle.className = 'error';
+        statusMessage.textContent = 'Kod bulunamadı.';
+        return;
+    }
+
+    async function completeAuth() {
+        try {
+            const res = await fetch('https://fireeye-api.ereny116011.workers.dev/api/support/auth/' + provider, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+
+            if (data.success && data.token) {
+                // Token'ı localStorage'a kaydet
+                localStorage.setItem('fireeye_user', JSON.stringify({
+                    token: data.token,
+                    user: data.user
+                }));
+
+                statusTitle.textContent = 'Başarılı!';
+                statusTitle.className = 'success';
+                statusMessage.textContent = provider.charAt(0).toUpperCase() + provider.slice(1) + ' ile giriş yapıldı. Yönlendiriliyorsunuz...';
+
+                // Ana pencereye mesaj gönder ve kapat
+                if (window.opener) {
+                    window.opener.postMessage({ type: 'oauth_success', provider, token: data.token }, window.location.origin);
+                }
+
+                setTimeout(() => {
+                    if (window.opener) {
+                        window.opener.location.reload();
+                    }
+                    window.close();
+                }, 1500);
+            } else {
+                statusTitle.textContent = 'Giriş başarısız';
+                statusTitle.className = 'error';
+                statusMessage.textContent = data.message || 'Bilinmeyen hata';
+            }
+        } catch (e) {
+            statusTitle.textContent = 'Bağlantı hatası';
+            statusTitle.className = 'error';
+            statusMessage.textContent = 'Sunucuya ulaşılamadı.';
+        }
+    }
+
+    completeAuth();
+})();
+</script>
+</body>
+</html>
